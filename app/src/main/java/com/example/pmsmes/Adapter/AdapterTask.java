@@ -4,36 +4,55 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pmsmes.ItemAdapter.Item_Task;
 
 import java.util.ArrayList;
-public class AdapterTask extends ArrayAdapter{
-    Context context;
-    int layoutItem;
-    ArrayList<Item_Task> ItemTask;
+public class AdapterTask extends RecyclerView.Adapter<AdapterTask.ViewHolder>{
+    private Context context;
+    private int layoutItem;
+    private ArrayList<Item_Task> itemTaskList;
 
-    public AdapterTask(@NonNull Context context, int resource, @NonNull ArrayList<Item_Task> ItemTask) {
-        super(context, resource, ItemTask);
+
+    public AdapterTask(Context context, int layoutItem, ArrayList<Item_Task> itemTaskList) {
         this.context = context;
-        this.layoutItem = resource;
-        this.ItemTask = ItemTask;
+        this.layoutItem = layoutItem;
+        this.itemTaskList = itemTaskList;
+    }
+    public AdapterTask( ArrayList<Item_Task> itemTaskList) {
+        this.itemTaskList = itemTaskList;
+    }
+    public AdapterTask(Context context, ArrayList<Item_Task> itemTaskList) {
+        this.context = context;
+        this.itemTaskList = itemTaskList;
     }
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Item_Task task =ItemTask.get(position);
-        if(convertView==null){
-            convertView = LayoutInflater.from(context).inflate(layoutItem,null);
-        }
-        TextView tvName = (TextView) convertView.findViewById(R.id.tv_nameTask);
-        tvName.setText(task.getName());
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
+        return new ViewHolder(view);
+    }
 
-        return convertView;
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Item_Task itemTask = itemTaskList.get(position);
+        holder.tvName.setText(itemTask.getName());
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemTaskList.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvName;
+        public ViewHolder(View itemView) {
+            super(itemView);
+            tvName = itemView.findViewById(R.id.tv_nameTask);
+        }
     }
 }
