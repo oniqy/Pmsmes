@@ -19,21 +19,21 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button2"
+            android:id="@+id/btn_addTask"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="add task"
+            android:background="@drawable/layout_btn_addtask"
+            android:drawableStart="@drawable/baseline_add_24"
+            android:gravity="left|center"
             android:paddingLeft="10dp"
+            android:text="add task"
+            android:textAllCaps="false"
             android:textColor="#0984E3"
             android:textSize="20dp"
-            android:gravity="left|center"
-            android:background="@drawable/layout_btn_addtask"
-            android:textAllCaps="false"
-            android:drawableStart="@drawable/baseline_add_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerViewTasks" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_cancel" />
 
         <TextView
             android:id="@+id/tvStageName"
@@ -55,16 +55,50 @@
             app:srcCompat="@drawable/baseline_more_horiz_24_black"
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="#D9D9D9"
+            android:text="Cancel"
+            app:layout_constraintEnd_toStartOf="@+id/btn_save"
+            app:layout_constraintTop_toBottomOf="@+id/edt_newTask" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="10dp"
+            android:background="#0984E3"
+            android:text="Save"
+            android:textColor="#FFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edt_newTask"
+            tools:ignore="TextContrastCheck" />
+
+        <EditText
+            android:id="@+id/edt_newTask"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="10dp"
+            android:textSize="20dp"
+            android:hint="Name Task..."
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recyclerViewTasks" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewTasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:background="#DFE6E9"
-            app:layout_constraintBottom_toTopOf="@+id/button2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvStageName" />
+            app:layout_constraintTop_toBottomOf="@+id/imageButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -30,7 +30,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_project_workspace2);
         recyc =(RecyclerView) findViewById(R.id.recyc);
         itemStages = ItemStage.inititStage(lstname);
-        adapterStage =new AdapterStage(itemStages);
+        adapterStage =new AdapterStage(itemStages,this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc.setLayoutManager(layoutManager);
         recyc.setAdapter(adapterStage);
