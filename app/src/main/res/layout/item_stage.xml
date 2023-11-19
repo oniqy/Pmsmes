@@ -46,7 +46,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/btn_optionStage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="#DFE6E9"
@@ -64,7 +64,8 @@
             android:background="#D9D9D9"
             android:text="Cancel"
             app:layout_constraintEnd_toStartOf="@+id/btn_save"
-            app:layout_constraintTop_toBottomOf="@+id/edt_newTask" />
+            app:layout_constraintTop_toBottomOf="@+id/edt_newTask"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_save"
@@ -76,7 +77,7 @@
             android:textColor="#FFFF"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edt_newTask"
-            tools:ignore="TextContrastCheck" />
+            tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
 
         <EditText
             android:id="@+id/edt_newTask"
@@ -98,7 +99,7 @@
             android:background="#DFE6E9"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageButton" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_optionStage" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

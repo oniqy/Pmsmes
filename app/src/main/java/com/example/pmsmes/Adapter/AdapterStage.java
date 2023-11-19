@@ -8,11 +8,14 @@ import com.example.pmsmes.ItemAdapter.Item_Task;
 import com.example.pmsmes.R;
 
 import android.content.Intent;
+import android.icu.text.Transliterator;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import android.widget.PopupMenu;
 public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder> implements AdapterTask.OnTaskItemClickListener{
     ArrayList<ItemStage> itemStage = new ArrayList<>();
     ArrayList<ArrayList<Item_Task>> itemTask = new ArrayList<>();
@@ -102,6 +106,12 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                 }
             }
         });
+        holder.btn_optionStage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showOptionsStage(v,position);
+            }
+        });
         holder.textV_name.setText(String.valueOf(item.getTvStageName()));
     }
     private void updateRecyclerViewTask(String taskName, int position, MyViewHolder holder) {
@@ -114,6 +124,23 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         holder.recyclerViewTasks.setAdapter(adapterTask);
         holder.edt_newTask.setText("");
     }
+    @SuppressLint("ResourceType")
+    private void showOptionsStage(View view, int position) {
+        PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.option_stage, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.menu_item_removeStage) {
+                    itemStage.remove(position);
+                    notifyItemRemoved(position);
+                }
+                return true;
+            }
+        });
+        popupMenu.show();
+    }
 
     @Override
     public int getItemCount() {
@@ -124,9 +151,11 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         public TextView textV_name;
         public RecyclerView recyclerViewTasks;
         public Button btn_addTask,btn_cancel,btn_save;
+        public ImageButton btn_optionStage;
         public EditText edt_newTask;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            btn_optionStage = (ImageButton) itemView.findViewById(R.id.btn_optionStage);
             textV_name = (TextView) itemView.findViewById(R.id.tvStageName);
             edt_newTask = (EditText) itemView.findViewById(R.id.edt_newTask);
             recyclerViewTasks = (RecyclerView) itemView.findViewById(R.id.recyclerViewTasks);
