@@ -84,7 +84,7 @@
             android:layout_height="65dp"
             android:layout_marginTop="10dp"
             android:textSize="20dp"
-            android:hint="Name Task..."
+            android:hint="Task Name..."
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -93,7 +93,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewTasks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="10dp"
             android:background="#DFE6E9"
             app:layout_constraintEnd_toEndOf="parent"

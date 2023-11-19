@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Pmsmes</string>
+    <string name="Add">Add Stage</string>
+    <string name="cancel">cancel</string>
 </resources>

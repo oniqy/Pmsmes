@@ -1,4 +1,5 @@
 package com.example.pmsmes.Adapter;
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.example.pmsmes.Controller.EditTask_Activity;
@@ -41,8 +42,8 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     public void onTaskItemClick(int stagePosition, int taskPosition) {
         //SelectItemTask
         Intent edtTask = new Intent(context, EditTask_Activity.class);
-        context.startActivity(edtTask);
-        Toast.makeText(context, "Task clicked at position: " + taskPosition, Toast.LENGTH_SHORT).show();
+
+        context.startActivity(edtTask.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
     @NonNull
     @Override
@@ -59,7 +60,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         void onItemClick(int position);
     }
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         ItemStage item = itemStage.get(position);
         LinearLayoutManager layoutManager = new LinearLayoutManager(holder.recyclerViewTasks.getContext(),
                 LinearLayoutManager.VERTICAL,false);
@@ -101,13 +102,6 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                 }
             }
         });
-        adapterTask = new AdapterTask(itemTask.get(position),position);
-        adapterTask.setOnTaskItemClickListener(new AdapterTask.OnTaskItemClickListener() {
-            @Override
-            public void onTaskItemClick(int stagePosition, int taskPosition) {
-                Toast.makeText(context, "hello", Toast.LENGTH_SHORT).show();
-            }
-        });
         holder.textV_name.setText(String.valueOf(item.getTvStageName()));
     }
     private void updateRecyclerViewTask(String taskName, int position, MyViewHolder holder) {
@@ -118,6 +112,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         adapterTask.setOnTaskItemClickListener(this);
         adapterTask.notifyDataSetChanged();
         holder.recyclerViewTasks.setAdapter(adapterTask);
+        holder.edt_newTask.setText("");
     }
 
     @Override
