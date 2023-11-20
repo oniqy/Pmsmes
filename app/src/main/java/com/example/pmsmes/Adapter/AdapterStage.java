@@ -1,5 +1,6 @@
 package com.example.pmsmes.Adapter;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.content.Context;
 
 import com.example.pmsmes.Controller.EditTask_Activity;
@@ -8,7 +9,9 @@ import com.example.pmsmes.ItemAdapter.Item_Task;
 import com.example.pmsmes.R;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.icu.text.Transliterator;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,18 +23,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 import android.widget.PopupMenu;
-public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder> implements AdapterTask.OnTaskItemClickListener{
+public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder> implements AdapterTask.OnTaskItemClickListener, ItemMoveStage.ItemTouchHelperContract {
     ArrayList<ItemStage> itemStage = new ArrayList<>();
     ArrayList<ArrayList<Item_Task>> itemTask = new ArrayList<>();
     AdapterTask adapterTask;
     private Context context;
-    public AdapterStage(ArrayList<ItemStage> itemStage,Context context) {
+
+    public AdapterStage(ArrayList<ItemStage> itemStage, Context context) {
         this.itemStage = itemStage;
         this.context = context;
         for (int i = 0; i < itemStage.size(); i++) {
@@ -42,11 +50,11 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     public AdapterStage(Context context) {
         this.context = context;
     }
-    @Override
-    public void onTaskItemClick(int stagePosition, int taskPosition) {
-        //SelectItemTask
-        Intent edtTask = new Intent(context, EditTask_Activity.class);
 
+    @Override
+    //SelectItemTask
+    public void onTaskItemClick(int stagePosition, int taskPosition) {
+        Intent edtTask = new Intent(context, EditTask_Activity.class);
         context.startActivity(edtTask.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
     @NonNull
@@ -60,6 +68,33 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         itemView.setLayoutParams(params);
         return new MyViewHolder(itemView);
     }
+
+    @Override
+    public void onColumnMoved(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(itemStage, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(itemStage, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @SuppressLint("ResourceAsColor")
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    @Override
+    public void onColumnSelected(MyViewHolder myViewHolder) {
+
+    }
+
+    @Override
+    public void onColumnClear(MyViewHolder myViewHolder) {
+
+    }
+
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
@@ -93,7 +128,6 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         holder.btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String newTask = holder.edt_newTask.getText().toString();
                 if (newTask != null && !newTask.isEmpty()) {
                     updateRecyclerViewTask(newTask,position,holder);
@@ -115,12 +149,18 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         holder.textV_name.setText(String.valueOf(item.getTvStageName()));
     }
     private void updateRecyclerViewTask(String taskName, int position, MyViewHolder holder) {
+        //theo task tuong ung voi stage
         Item_Task task = new Item_Task();
         task.name = taskName;
         itemTask.get(position).add(task);
         adapterTask = new AdapterTask(itemTask.get(position),position);
         adapterTask.setOnTaskItemClickListener(this);
         adapterTask.notifyDataSetChanged();
+        //Move Item Task
+        ItemTouchHelper.Callback callback =
+                new ItemMoveTask(adapterTask);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(holder.recyclerViewTasks);
         holder.recyclerViewTasks.setAdapter(adapterTask);
         holder.edt_newTask.setText("");
     }
@@ -153,8 +193,11 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         public Button btn_addTask,btn_cancel,btn_save;
         public ImageButton btn_optionStage;
         public EditText edt_newTask;
+        public View rowView;
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+            rowView = itemView;
             btn_optionStage = (ImageButton) itemView.findViewById(R.id.btn_optionStage);
             textV_name = (TextView) itemView.findViewById(R.id.tvStageName);
             edt_newTask = (EditText) itemView.findViewById(R.id.edt_newTask);

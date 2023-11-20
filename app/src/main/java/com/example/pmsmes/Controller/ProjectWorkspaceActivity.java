@@ -1,6 +1,7 @@
 package com.example.pmsmes.Controller;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +24,7 @@ import android.os.Bundle;
 
 import com.example.pmsmes.Adapter.AdapterStage;
 import com.example.pmsmes.Adapter.AdapterTask;
+import com.example.pmsmes.Adapter.ItemMoveStage;
 import com.example.pmsmes.ItemAdapter.ItemStage;
 import com.example.pmsmes.ItemAdapter.Item_Task;
 import com.example.pmsmes.R;
@@ -59,6 +61,11 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         adapterStage =new AdapterStage(itemStages,this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
+        //MoveItem
+        ItemTouchHelper.Callback callback =
+                new ItemMoveStage(adapterStage);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyc_Stage);
         recyc_Stage.setAdapter(adapterStage);
         //Snap item recyclerView
         SnapHelper snapHelper = new LinearSnapHelper();
