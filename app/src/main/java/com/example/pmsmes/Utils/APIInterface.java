@@ -3,6 +3,7 @@ package com.example.pmsmes.Utils;
 import com.example.pmsmes.Models.CreateNewTask;
 import com.example.pmsmes.Models.GetProjectByID;
 import com.example.pmsmes.Models.GetProjectMemberList;
+import com.example.pmsmes.Models.GetProjectStages;
 import com.example.pmsmes.Models.GetProjectTask;
 import com.example.pmsmes.Models.Login;
 import com.example.pmsmes.Models.Project;
@@ -17,6 +18,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -33,6 +35,10 @@ public interface APIInterface {
     @GET("/api/project/{id}/members")
     Call<GetProjectMemberList> getProjectMemberList(@Path("id") String projectId);
 
+    //Stage
+    @Headers({ "Content-Type: application/json;charset=UTF-8"})
+    @GET("/api/project/{id}/stages")
+    Call<GetProjectStages> getProjectStages(@Header("Authorization") String token, @Path("id") String projectId);
 
     //TASK
     @GET("/api/project/{id}/tasks")

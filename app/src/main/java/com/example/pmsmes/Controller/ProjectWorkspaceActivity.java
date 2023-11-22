@@ -1,4 +1,5 @@
 package com.example.pmsmes.Controller;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -11,7 +12,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,18 +31,30 @@ import com.example.pmsmes.Adapter.AdapterTask;
 import com.example.pmsmes.Adapter.ItemMoveStage;
 import com.example.pmsmes.ItemAdapter.ItemStage;
 import com.example.pmsmes.ItemAdapter.Item_Task;
+import com.example.pmsmes.Models.GetProjectByID;
+import com.example.pmsmes.Models.GetProjectStages;
+import com.example.pmsmes.Models.Login;
+import com.example.pmsmes.Models.ProjectResponse;
 import com.example.pmsmes.R;
+import com.example.pmsmes.TESTAPIACTIVITY.APITest;
+import com.example.pmsmes.Utils.APIClient;
+import com.example.pmsmes.Utils.APIInterface;
 
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProjectWorkspaceActivity extends AppCompatActivity {
     RecyclerView recyc_Stage;
@@ -47,16 +63,45 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     ImageButton img_buttonOption;
     String stageName;
     ArrayList<String> lstStage = new ArrayList<>();
-    String[] lstname=new String[]{"ToDo","OnGoing","Done","Cancel"};
-    @SuppressLint("MissingInflatedId")
+    ArrayList<String> lstname= new ArrayList<>();
+    TextView projectName;
+    private APIInterface apiServices;
+    String demoProjectID = "6552e8416bbf6b45d1036429";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_workspace2);
+
+        addControls();
+        addEvents();
+
+        //apiServices Setup
+        apiServices = APIClient.getClient().create(APIInterface.class);
+        getProject();
+        GetProjectStages();
+
+
+
+
+
+    }
+
+    private void addControls(){
+        projectName = findViewById(R.id.projectName);
+        img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
+    }
+
+    private void addEvents(){
+        img_buttonOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showOptionsMenu(v);
+            }
+        });
+    }
+    private void setupRecycleView(){
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
-        img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
-
         //set adapter recyclerView
         itemStages = ItemStage.inititStage(lstname);
         adapterStage =new AdapterStage(itemStages,this);
@@ -73,15 +118,86 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         //Snap item recyclerView
         SnapHelper snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(recyc_Stage);
+    }
 
-        //event
-        img_buttonOption.setOnClickListener(new View.OnClickListener() {
+    //call get project stages
+    private void GetProjectStages(){
+
+        if (APIClient.getToken(this) == ""){
+            apiServices.login("akkii0609","daylamatkhausieubaomat").enqueue(new Callback<Login>() {
+                @Override
+                public void onResponse(Call<Login> call, Response<Login> response) {
+                    if (response.isSuccessful()){
+                        APIClient.setToken(ProjectWorkspaceActivity.this, response.body().getToken());
+                        Toast.makeText(ProjectWorkspaceActivity.this, "Logged in", Toast.LENGTH_SHORT).show();
+
+                        apiServices.getProjectStages(APIClient.getToken(ProjectWorkspaceActivity.this), demoProjectID).enqueue(new Callback<GetProjectStages>() {
+                            @Override
+                            public void onResponse(@NonNull Call<GetProjectStages> call, Response<GetProjectStages> response) {
+                                GetProjectStages res = response.body();
+                                if (res != null){
+                                    Log.d("Aki",res.getStatus());
+                                    for (int i = 0; i < res.getData().size(); i++) {
+                                        lstname.add(res.getData().get(i).getName());
+
+                                    }
+                                    setupRecycleView();
+                                }else Log.d("Aki", String.valueOf(response.code()));
+                            }
+                            @Override
+                            public void onFailure(@NonNull Call<GetProjectStages> call, Throwable t) {
+                                Log.d("Aki", t.getMessage());
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Login> call, Throwable t) {
+
+                }
+            });
+
+
+        }else{
+            apiServices.getProjectStages(APIClient.getToken(this), demoProjectID).enqueue(new Callback<GetProjectStages>() {
+                @Override
+                public void onResponse(@NonNull Call<GetProjectStages> call, Response<GetProjectStages> response) {
+                    GetProjectStages res = response.body();
+                    if (res != null){
+                        Log.d("Aki",res.getStatus());
+                        for (int i = 0; i < res.getData().size(); i++) {
+                            lstname.add(res.getData().get(i).getName());
+
+                        }
+                        setupRecycleView();
+                    }else Log.d("Aki", String.valueOf(response.code()));
+                }
+                @Override
+                public void onFailure(@NonNull Call<GetProjectStages> call, Throwable t) {
+                    Log.d("Aki", t.getMessage());
+                }
+            });
+        }
+
+    }
+
+    private void getProject(){
+        apiServices.getProjectByID(demoProjectID).enqueue(new Callback<GetProjectByID>() {
             @Override
-            public void onClick(View v) {
-                showOptionsMenu(v);
+            public void onResponse(Call<GetProjectByID> call, Response<GetProjectByID> response) {
+                if (response.isSuccessful()){
+                    projectName.setText(response.body().getData().getName());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetProjectByID> call, Throwable t) {
+
             }
         });
     }
+
     //show option Menu
     @SuppressLint("ResourceType")
     private void showOptionsMenu(View view) {

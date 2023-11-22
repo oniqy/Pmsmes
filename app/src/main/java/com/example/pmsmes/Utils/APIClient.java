@@ -25,7 +25,7 @@ public class APIClient {
 
     public static void setToken(Context context, String token){
         @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE).edit();
-        editor.putString("token", token);
+        editor.putString("token", "Bearer " + token);
         editor.apply();
     }
 

@@ -20,10 +20,10 @@ public class ItemStage {
 
     }
 
-    public static ArrayList<ItemStage> inititStage(String[] ten){
+    public static ArrayList<ItemStage> inititStage(ArrayList<String> ten){
         ArrayList<ItemStage> itemStages = new ArrayList<>();
-        for(int i = 0 ; i< ten.length;i++){
-            ItemStage item = new ItemStage(ten[i]);
+        for(int i = 0 ; i< ten.size();i++){
+            ItemStage item = new ItemStage(ten.get(i));
             itemStages.add(item);
         }
         return itemStages;

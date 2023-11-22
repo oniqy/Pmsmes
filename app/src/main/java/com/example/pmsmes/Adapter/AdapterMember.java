@@ -40,8 +40,7 @@ public class AdapterMember extends ArrayAdapter {
         TextView tv_email = convertView.findViewById(R.id.tv_email);
         tv_email.setText(item_member.getEmail());
         ImageView img_avatar = convertView.findViewById(R.id.img_avatar);
-        Picasso.with(context).load(item_member.getAvata()).
-                resize(100,100).into(img_avatar);
+        Picasso.get().load(item_member.getAvata()).resize(100,100).into(img_avatar);
         return convertView;
     }
 }

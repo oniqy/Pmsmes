@@ -19,6 +19,14 @@
             android:name=".TESTAPIACTIVITY.APITest"
             android:exported="true">
 
+
+        </activity>
+        <activity
+            android:name=".Controller.EditTask_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".Controller.ProjectWorkspaceActivity"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -27,19 +35,9 @@
 
         </activity>
         <activity
-            android:name=".Controller.EditTask_Activity"
-            android:exported="false" />
-        <activity
-            android:name=".Controller.ProjectWorkspaceActivity"
-            android:exported="true" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
