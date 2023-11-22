@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pmsmes.ItemAdapter.Item_Task;
 
 import java.util.ArrayList;
-public class AdapterTask extends RecyclerView.Adapter<AdapterTask.ViewHolder>{
+import java.util.Collections;
+
+public class AdapterTask extends RecyclerView.Adapter<AdapterTask.ViewHolder> implements ItemMoveTask.ItemTouchHelperContract {
     private Context context;
     private int layoutItem;
     private ArrayList<Item_Task> itemTaskList;
@@ -25,6 +27,31 @@ public class AdapterTask extends RecyclerView.Adapter<AdapterTask.ViewHolder>{
         this.itemTaskList = itemTaskList;
         this.stagePosition = stagePosition;
     }
+
+    @Override
+    public void onRowMoved(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(itemTaskList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(itemTaskList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onRowSelected(AdapterStage.MyViewHolder myViewHolder) {
+
+    }
+
+    @Override
+    public void onRowClear(AdapterStage.MyViewHolder myViewHolder) {
+
+    }
+
     public interface OnTaskItemClickListener {
         void onTaskItemClick(int stagePosition, int taskPosition);
     }

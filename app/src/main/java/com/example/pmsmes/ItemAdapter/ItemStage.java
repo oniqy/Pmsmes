@@ -3,7 +3,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 public class ItemStage {
-    private String tvStageName;
+    public String tvStageName;
 
     public String getTvStageName() {
         return tvStageName;
@@ -15,6 +15,9 @@ public class ItemStage {
 
     public ItemStage(String tvStageName) {
         this.tvStageName = tvStageName;
+    }
+    public ItemStage() {
+
     }
 
     public static ArrayList<ItemStage> inititStage(String[] ten){
