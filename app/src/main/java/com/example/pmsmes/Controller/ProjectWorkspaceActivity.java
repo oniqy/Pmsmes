@@ -56,20 +56,24 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
         img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
+
         //set adapter recyclerView
         itemStages = ItemStage.inititStage(lstname);
         adapterStage =new AdapterStage(itemStages,this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
+
         //MoveItem
         ItemTouchHelper.Callback callback =
                 new ItemMoveStage(adapterStage);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyc_Stage);
         recyc_Stage.setAdapter(adapterStage);
+
         //Snap item recyclerView
         SnapHelper snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(recyc_Stage);
+
         //event
         img_buttonOption.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,8 +111,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                             ItemStage itemStage = new ItemStage();
                             itemStage.tvStageName = stageName;
                             itemStages.add(itemStage);
-                            adapterStage = new AdapterStage(itemStages,getApplicationContext());
-                            recyc_Stage.setAdapter(adapterStage);
+                            adapterStage.notifyDataSetChanged();
                             Toast.makeText(getApplicationContext(), "New Stage Added", Toast.LENGTH_LONG).show();
                             // Handle non-empty stageName
                         } else {
@@ -136,18 +139,18 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         ListView listView = dialogView.findViewById(R.id.list_email);
         RecyclerView listAavatar = dialogView.findViewById(R.id.list_avatar);
         builder.setView(dialogView)
-            .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                }
-            })
-            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
         AlertDialog dialog = builder.create();
         dialog.show();
     }

@@ -61,11 +61,6 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_stage, parent, false);
-        RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        itemView.setLayoutParams(params);
         return new MyViewHolder(itemView);
     }
 
