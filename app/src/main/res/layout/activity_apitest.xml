@@ -20,7 +20,7 @@
             android:stretchColumns="1">
 
             <LinearLayout
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -48,19 +48,59 @@
                         android:text="getProjectById(Id)"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
-                </LinearLayout>
-            </LinearLayout>
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <Button
+                        android:id="@+id/getProjectTaskBtn"
+                        android:layout_weight="1"
+                        android:text="getProjectTask"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <Button
+                        android:id="@+id/createNewTaskBtn"
+                        android:layout_weight="1"
+                        android:text="Create new task"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <Button
+                        android:id="@+id/updateProjectTaskBtn"
+                        android:layout_weight="1"
+                        android:text="Update Project Task"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+
+
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/getProjectStageBtn"
+                        android:layout_weight="1"
+                        android:text="getProjectStage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <Button
+                        android:id="@+id/createNewStageBtn"
+                        android:layout_weight="1"
+                        android:text="createNewStage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+
+                </LinearLayout>
+
 
 
             </LinearLayout>

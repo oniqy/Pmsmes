@@ -30,27 +30,40 @@ public interface APIInterface {
     Call<ProjectResponse> getAllProjects(@Header("Authorization") String token);
 
     @GET("/api/project/{id}")
-    Call<GetProjectByID> getProjectByID(@Path("id") String projectId);
+    Call<GetProjectByID> getProjectByID(@Header("Authorization") String token, @Path("id") String projectId);
 
     @GET("/api/project/{id}/members")
-    Call<GetProjectMemberList> getProjectMemberList(@Path("id") String projectId);
+    Call<GetProjectMemberList> getProjectMemberList(@Header("Authorization") String token, @Path("id") String projectId);
 
     //Stage
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
     @GET("/api/project/{id}/stages")
     Call<GetProjectStages> getProjectStages(@Header("Authorization") String token, @Path("id") String projectId);
 
+    @FormUrlEncoded
+    @POST("/api/project/{id}/stages")
+    Call<Object> createNewStage(@Header("Authorization") String token, @Path("id") String projectId, @Field("name") String stageName);
+
+    @PATCH("/api/project/{id}/stages")
+    Call<Object> updateProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Body Object body);
+
     //TASK
     @GET("/api/project/{id}/tasks")
-    Call<GetProjectTask> getProjectTask(@Path("id") String projectId);
+    Call<GetProjectTask> getProjectTask(@Header("Authorization") String token, @Path("id") String projectId);
 
     @FormUrlEncoded
     @POST("/api/project/{id}/tasks")
-    Call<CreateNewTask> createNewTask(@Path("id") String projectId, @Field("name") String taskName, @Field("creator") String creatorID, @Field("stage") String stageID);
+    Call<CreateNewTask> createNewTask(@Header("Authorization") String token, @Path("id") String projectId, @Field("name") String taskName, @Field("creator") String creatorID, @Field("stage") String stageID);
 
     @PATCH("/api/project/{id}/tasks")
-    Call<UpdateProjectTask> updateProjectTask(@Path("id") String projectId, @Body Object body);
+    Call<UpdateProjectTask> updateProjectTask(@Header("Authorization") String token, @Path("id") String projectId, @Body Object body);
 
+    @FormUrlEncoded
+    @PATCH("/api/project/{id}/tasks/assign")
+    Call<Object> assignTask(@Header("Authorization") String token, @Field("task") String taskID, @Field("assignee") String[] memberToAssignList);
+
+//    @DELETE("/api/project/{id}/tasks/")
+//    Call<Object> deleteTask(@Header("Authorization") String token,)
 
     //User
 

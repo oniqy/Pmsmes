@@ -74,7 +74,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
         addControls();
         addEvents();
-
+        APIClient.setToken(this, "");
         //apiServices Setup
         apiServices = APIClient.getClient().create(APIInterface.class);
         getProject();
@@ -85,6 +85,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
 
     }
+
 
     private void addControls(){
         projectName = findViewById(R.id.projectName);
@@ -122,8 +123,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
     //call get project stages
     private void GetProjectStages(){
-
-        if (APIClient.getToken(this) == ""){
+        Log.d("Aki", String.valueOf(APIClient.getToken(this).length()));
+        if (APIClient.getToken(this).length()==7){
             apiServices.login("akkii0609","daylamatkhausieubaomat").enqueue(new Callback<Login>() {
                 @Override
                 public void onResponse(Call<Login> call, Response<Login> response) {
@@ -183,7 +184,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     }
 
     private void getProject(){
-        apiServices.getProjectByID(demoProjectID).enqueue(new Callback<GetProjectByID>() {
+        apiServices.getProjectByID(APIClient.getToken(this),demoProjectID).enqueue(new Callback<GetProjectByID>() {
             @Override
             public void onResponse(Call<GetProjectByID> call, Response<GetProjectByID> response) {
                 if (response.isSuccessful()){

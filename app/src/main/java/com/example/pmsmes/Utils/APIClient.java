@@ -29,6 +29,7 @@ public class APIClient {
         editor.apply();
     }
 
+
     public static Retrofit getClient(){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
