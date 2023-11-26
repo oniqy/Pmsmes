@@ -73,4 +73,7 @@ public interface APIInterface {
     @FormUrlEncoded
     @POST("/api/account/login")
     Call<Login> login(@Field("username") String username, @Field("password") String password);
+
+    @GET("/api/account/logout")
+    Call<Object> logout(@Header("Authorization") String token);
 }
