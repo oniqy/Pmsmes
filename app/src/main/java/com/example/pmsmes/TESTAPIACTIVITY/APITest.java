@@ -10,25 +10,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.pmsmes.Models.CreateNewTask;
-import com.example.pmsmes.Models.GetProjectByID;
-import com.example.pmsmes.Models.GetProjectStages;
-import com.example.pmsmes.Models.GetProjectTask;
 import com.example.pmsmes.Models.Login;
-import com.example.pmsmes.Models.Project;
-import com.example.pmsmes.Models.ProjectResponse;
-import com.example.pmsmes.Models.UpdateProjectTask;
 import com.example.pmsmes.R;
 import com.example.pmsmes.Utils.APIClient;
 import com.example.pmsmes.Utils.APIInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -145,16 +133,16 @@ public class APITest extends AppCompatActivity {
     }
 
     private void getProjectStage(){
-        apiServices.getProjectStages(APIClient.getToken(this), testProjectID).enqueue(new Callback<GetProjectStages>() {
+        apiServices.getProjectStages(APIClient.getToken(this), testProjectID).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<GetProjectStages> call, Response<GetProjectStages> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
                     logData(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<GetProjectStages> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 Log.d("Akkii", t.getMessage());
             }
         });
@@ -168,16 +156,16 @@ public class APITest extends AppCompatActivity {
         JsonObject infoToUpdate = new JsonObject ();
         infoToUpdate.addProperty("name", sampleTaskName);
         infoToUpdate.addProperty("task", sampleTaskID);
-        apiServices.updateProjectTask(APIClient.getToken(this),testProjectID, infoToUpdate).enqueue(new Callback<UpdateProjectTask>() {
+        apiServices.updateProjectTask(APIClient.getToken(this),testProjectID, infoToUpdate).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<UpdateProjectTask> call, Response<UpdateProjectTask> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
                     logData(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<UpdateProjectTask> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 Log.d("Akkii", t.getMessage());
             }
         });
@@ -188,33 +176,33 @@ public class APITest extends AppCompatActivity {
         String sampleTaskName = "Task created from Android";
         String sampleCreatorID = "655374e35a5af92bb155bd9e";
         String sampleStageID = "65538f4bf63cf027b238c298";
-        apiServices.createNewTask(APIClient.getToken(this), testProjectID,sampleTaskName,sampleCreatorID,sampleStageID).enqueue(new Callback<CreateNewTask>() {
+        apiServices.createNewTask(APIClient.getToken(this), testProjectID,sampleTaskName,sampleCreatorID,sampleStageID).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<CreateNewTask> call, Response<CreateNewTask> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
                     logData(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<CreateNewTask> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 Log.d("Akkii", t.getMessage());
             }
         });
     }
 
     private void getProjectTask(){
-        apiServices.getProjectTask(APIClient.getToken(this),testProjectID).enqueue(new Callback<GetProjectTask>() {
+        apiServices.getProjectTask(APIClient.getToken(this),testProjectID).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<GetProjectTask> call, Response<GetProjectTask> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
-                    GetProjectTask tasks = response.body();
-                    logData(tasks);
+
+                    logData(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<GetProjectTask> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 Log.d("Akkii", t.getMessage());
             }
         });
@@ -227,11 +215,10 @@ public class APITest extends AppCompatActivity {
                 .enqueue(new Callback<Login>() {
                     @Override
                     public void onResponse(Call<Login> call, Response<Login> response) {
-                        Login res = response.body();
-                        if (res != null){
+                        if (response.isSuccessful()){
                             Toast.makeText(APITest.this, "Đăng nhập thành công!!", Toast.LENGTH_SHORT).show();
-                            logData(res);
-                            APIClient.setToken(APITest.this, res.getToken());
+                            logData(response.body());
+                            APIClient.setToken(APITest.this, response.body().getToken());
                             Toast.makeText(APITest.this, APIClient.getToken(APITest.this), Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -246,10 +233,10 @@ public class APITest extends AppCompatActivity {
     private void getProjectByID(){
 
         String id = "6555e26489bc2f849bb81cbd";
-        apiServices.getProjectByID(APIClient.getToken(this),id).enqueue(new Callback<GetProjectByID>() {
+        apiServices.getProjectByID(APIClient.getToken(this),id).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<GetProjectByID> call, Response<GetProjectByID> response) {
-                GetProjectByID res = response.body();
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                Object res = response.body();
 
                 if (res !=null){
                     logData(res);
@@ -257,7 +244,7 @@ public class APITest extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<GetProjectByID> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
 
             }
         });
@@ -270,18 +257,17 @@ public class APITest extends AppCompatActivity {
     }
     private void getAllProject(){
 
-        apiServices.getAllProjects(APIClient.getToken(this)).enqueue(new Callback<ProjectResponse>() {
+        apiServices.getAllProjects(APIClient.getToken(this)).enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<ProjectResponse> call, Response<ProjectResponse> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
 
-                ProjectResponse res = response.body();
-                if (res != null){
-                    logData(res);
+                if (response.isSuccessful()){
+                    logData(response.body());
                 }
             }
 
             @Override
-            public void onFailure(Call<ProjectResponse> call, Throwable t) {
+            public void onFailure(Call<Object> call, Throwable t) {
                 Log.d("AKII_Fail", t.toString());
             }
         });

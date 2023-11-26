@@ -1,5 +1,4 @@
 package com.example.pmsmes.Controller;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -9,34 +8,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import java.util.ArrayList;
-import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.recyclerview.widget.SnapHelper;
 
-import android.os.Bundle;
-
 import com.example.pmsmes.Adapter.AdapterStage;
-import com.example.pmsmes.Adapter.AdapterTask;
 import com.example.pmsmes.Adapter.ItemMoveStage;
 import com.example.pmsmes.ItemAdapter.ItemStage;
-import com.example.pmsmes.ItemAdapter.Item_Task;
-import com.example.pmsmes.Models.GetProjectByID;
-import com.example.pmsmes.Models.GetProjectStages;
-import com.example.pmsmes.Models.Login;
-import com.example.pmsmes.Models.ProjectResponse;
 import com.example.pmsmes.R;
-import com.example.pmsmes.TESTAPIACTIVITY.APITest;
 import com.example.pmsmes.Utils.APIClient;
 import com.example.pmsmes.Utils.APIInterface;
 
@@ -47,14 +31,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ProjectWorkspaceActivity extends AppCompatActivity {
     RecyclerView recyc_Stage;
@@ -77,13 +53,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         APIClient.setToken(this, "");
         //apiServices Setup
         apiServices = APIClient.getClient().create(APIInterface.class);
-        getProject();
-        GetProjectStages();
-
-
-
-
-
     }
 
 
@@ -121,83 +90,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         snapHelper.attachToRecyclerView(recyc_Stage);
     }
 
-    //call get project stages
-    private void GetProjectStages(){
-        Log.d("Aki", String.valueOf(APIClient.getToken(this).length()));
-        if (APIClient.getToken(this).length()==7){
-            apiServices.login("akkii0609","daylamatkhausieubaomat").enqueue(new Callback<Login>() {
-                @Override
-                public void onResponse(Call<Login> call, Response<Login> response) {
-                    if (response.isSuccessful()){
-                        APIClient.setToken(ProjectWorkspaceActivity.this, response.body().getToken());
-                        Toast.makeText(ProjectWorkspaceActivity.this, "Logged in", Toast.LENGTH_SHORT).show();
-
-                        apiServices.getProjectStages(APIClient.getToken(ProjectWorkspaceActivity.this), demoProjectID).enqueue(new Callback<GetProjectStages>() {
-                            @Override
-                            public void onResponse(@NonNull Call<GetProjectStages> call, Response<GetProjectStages> response) {
-                                GetProjectStages res = response.body();
-                                if (res != null){
-                                    Log.d("Aki",res.getStatus());
-                                    for (int i = 0; i < res.getData().size(); i++) {
-                                        lstname.add(res.getData().get(i).getName());
-
-                                    }
-                                    setupRecycleView();
-                                }else Log.d("Aki", String.valueOf(response.code()));
-                            }
-                            @Override
-                            public void onFailure(@NonNull Call<GetProjectStages> call, Throwable t) {
-                                Log.d("Aki", t.getMessage());
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Login> call, Throwable t) {
-
-                }
-            });
-
-
-        }else{
-            apiServices.getProjectStages(APIClient.getToken(this), demoProjectID).enqueue(new Callback<GetProjectStages>() {
-                @Override
-                public void onResponse(@NonNull Call<GetProjectStages> call, Response<GetProjectStages> response) {
-                    GetProjectStages res = response.body();
-                    if (res != null){
-                        Log.d("Aki",res.getStatus());
-                        for (int i = 0; i < res.getData().size(); i++) {
-                            lstname.add(res.getData().get(i).getName());
-
-                        }
-                        setupRecycleView();
-                    }else Log.d("Aki", String.valueOf(response.code()));
-                }
-                @Override
-                public void onFailure(@NonNull Call<GetProjectStages> call, Throwable t) {
-                    Log.d("Aki", t.getMessage());
-                }
-            });
-        }
-
-    }
-
-    private void getProject(){
-        apiServices.getProjectByID(APIClient.getToken(this),demoProjectID).enqueue(new Callback<GetProjectByID>() {
-            @Override
-            public void onResponse(Call<GetProjectByID> call, Response<GetProjectByID> response) {
-                if (response.isSuccessful()){
-                    projectName.setText(response.body().getData().getName());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<GetProjectByID> call, Throwable t) {
-
-            }
-        });
-    }
 
     //show option Menu
     @SuppressLint("ResourceType")
