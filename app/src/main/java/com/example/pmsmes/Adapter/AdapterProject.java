@@ -38,14 +38,14 @@ public class AdapterProject extends RecyclerView.Adapter<AdapterProject.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Project project = projects.get(position);
         holder.projectName.setText(project.getName());
-        Resources resources = holder.itemView.getContext().getResources();
-        @SuppressLint("DiscouragedApi") int background = resources.getIdentifier(project.getBackground(), "drawable", context.getPackageName());
-        holder.projectBackground.setImageResource(background);
+//        Resources resources = holder.itemView.getContext().getResources();
+//        @SuppressLint("DiscouragedApi") int background = resources.getIdentifier(project.getBackground(), "drawable", context.getPackageName());
+//        holder.projectBackground.setImageResource(background);
     }
 
     @Override
     public int getItemCount() {
-        return projects != null ? projects.size() : 0;
+        return projects.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

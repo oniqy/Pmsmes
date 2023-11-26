@@ -23,6 +23,12 @@ public class APIClient {
         return token;
     }
 
+    public static String getUserID(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE);
+        String token = prefs.getString("id", null);
+        return token;
+    }
+
     public static void setToken(Context context, String token){
         @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE).edit();
         editor.putString("token", "Bearer " + token);
