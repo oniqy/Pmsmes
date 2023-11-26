@@ -4,6 +4,7 @@ import com.example.pmsmes.Models.Login;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -22,8 +23,17 @@ public interface APIInterface {
     @GET("/api/project/{id}")
     Call<Object> getProjectByID(@Header("Authorization") String token, @Path("id") String projectId);
 
+    @FormUrlEncoded
+    @POST("/api/project")
+    Call<Object> createNewProject(@Header("Authorization") String token,@Field("name") String projectName, @Field("description") String description, @Field("creator") String creatorId);
+
+    @DELETE("/api/project/{id}")
+    Call<Object> deleteProject(@Header("Authorization") String token,@Path("id") String projectId);
+
     @GET("/api/project/{id}/members")
     Call<Object> getProjectMemberList(@Header("Authorization") String token, @Path("id") String projectId);
+
+
 
     //Stage
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
@@ -56,13 +66,21 @@ public interface APIInterface {
 //    Call<Object> deleteTask(@Header("Authorization") String token,)
 
     //User
+    @GET("/api/users/{id}/project")
+    Call<Object> getMyProject(@Header("Authorization") String token, @Path("id") String userId);
 
+    @GET("/api/users/{id}")
+    Call<Object> getUserById(@Header("Authorization") String token, @Path("id") String userId);
 
 
     //ACCOUNT
     @FormUrlEncoded
     @POST("/api/account/login")
     Call<Login> login(@Field("username") String username, @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("/api/account/forgotPassword")
+    Call<Object> forgotPassword(@Field("email") String email);
 
     @GET("/api/account/logout")
     Call<Object> logout(@Header("Authorization") String token);

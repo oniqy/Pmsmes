@@ -4,5 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#0984E3</color>
     <color name="grey">#F8FCFF</color>
-
+    <color name="backgroundLogin">#DFE6E9</color>
+    <color name="backgroundButtonLogin">#0984E3</color>
+    <color name="userName">#2D3436</color>
 </resources>

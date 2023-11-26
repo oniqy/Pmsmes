@@ -30,6 +30,19 @@ public class APIClient {
     }
 
 
+    public static void setLoginInfo(Context context,String token,String account, String userID, String username, String address, String email, String birthday){
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE).edit();
+        editor.putString("token", "Bearer " + token);
+        editor.putString("id", userID);
+        editor.putString("account", account);
+        editor.putString("name", username);
+        editor.putString("birthday", birthday);
+        editor.putString("email", email);
+        editor.putString("address", address);
+        editor.apply();
+    }
+
+
     public static Retrofit getClient(){
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();

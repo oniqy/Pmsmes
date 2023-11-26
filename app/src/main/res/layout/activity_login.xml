@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="true"
+    android:background="@drawable/bkui"
+    tools:context=".Controller.LoginActivity">
+
+    <TextView
+        android:id="@+id/pmsmes"
+        android:layout_width="197dp"
+        android:layout_height="56dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="100dp"
+        android:layout_alignParentTop="true"
+        android:textStyle="bold"
+        android:layout_marginTop="80dp"
+        android:text="PMSMEs"
+        android:textAppearance="@style/pmsmes"
+        android:gravity="center_horizontal|center_vertical"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/loginform"
+        android:layout_width="315dp"
+        android:layout_height="281dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="200dp"
+        android:clipToOutline="true"
+        android:background="@color/backgroundLogin">
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/cardheader"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="40dp"
+            android:layout_width="273dp"
+            android:layout_height="18dp">
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="273dp"
+                android:layout_height="18dp"
+                android:text="Username"
+                android:textStyle="bold"
+                android:textAppearance="@style/username"
+                android:gravity="top"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/textbox"
+            android:layout_width="275dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/cardheader"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="40dp">
+
+            <EditText
+                android:id="@+id/username_edt"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/border"
+                android:gravity="center_vertical"
+                android:hint="Username here"
+                android:inputType="text"
+                android:padding="8dp"
+                android:textAppearance="@style/username_he"
+                tools:ignore="TouchTargetSizeCheck,DuplicateClickableBoundsCheck" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/cardheader1"
+            android:layout_width="275dp"
+            android:layout_height="18dp"
+            android:layout_below="@+id/textbox"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp">
+
+            <TextView
+                android:id="@+id/password"
+                android:layout_width="275dp"
+                android:layout_height="18dp"
+                android:textStyle="bold"
+                android:text="Password"
+                android:textAppearance="@style/password"
+                android:gravity="top"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/textbox1"
+            android:layout_width="275dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/cardheader1"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="40dp">
+
+            <EditText
+                android:id="@+id/password_edt"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/border"
+                android:padding="8dp"
+                android:gravity="center_vertical"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:textAppearance="@style/username_he"
+                tools:ignore="TouchTargetSizeCheck" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/cardheader2"
+            android:layout_width="275dp"
+            android:layout_height="18dp"
+            android:layout_below="@+id/textbox1"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp">
+
+            <TextView
+                android:id="@+id/forgot_passBtn"
+                android:layout_width="275dp"
+                android:layout_height="18dp"
+                android:text="Forgot password?"
+                android:textAppearance="@style/forgot_pass"
+                android:layout_weight="1"
+                android:enabled="true"
+                android:gravity="top"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/cardheader3"
+            android:layout_width="235dp"
+            android:layout_height="37dp"
+            android:layout_below="@+id/cardheader2"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="40dp">
+
+            <Button
+                android:id="@+id/loginBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/border"
+                android:text="Login"
+                tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>
