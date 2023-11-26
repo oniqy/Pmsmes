@@ -8,9 +8,6 @@ import com.example.pmsmes.Utils.APIInterface;
 
 public class MainActivity extends AppCompatActivity {
 
-    private APIInterface apiServices;
-    String token = "";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
