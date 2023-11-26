@@ -3,7 +3,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 public class ItemStage {
-    private String tvStageName;
+    public String tvStageName;
 
     public String getTvStageName() {
         return tvStageName;
@@ -16,11 +16,14 @@ public class ItemStage {
     public ItemStage(String tvStageName) {
         this.tvStageName = tvStageName;
     }
+    public ItemStage() {
 
-    public static ArrayList<ItemStage> inititStage(String[] ten){
+    }
+
+    public static ArrayList<ItemStage> inititStage(ArrayList<String> ten){
         ArrayList<ItemStage> itemStages = new ArrayList<>();
-        for(int i = 0 ; i< ten.length;i++){
-            ItemStage item = new ItemStage(ten[i]);
+        for(int i = 0 ; i< ten.size();i++){
+            ItemStage item = new ItemStage(ten.get(i));
             itemStages.add(item);
         }
         return itemStages;
