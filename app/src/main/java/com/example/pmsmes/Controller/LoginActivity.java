@@ -66,6 +66,12 @@ public class LoginActivity extends AppCompatActivity {
         addControls();
         addEvents();
 
+        if (APIClient.checkLastLogin(getApplicationContext())){
+            Toast.makeText(LoginActivity.this,"Xin chào, " + APIClient.getLoggedinName(this) + "! 😎", Toast.LENGTH_SHORT).show();
+            Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
+            startActivity(projectIntent);
+        }
+
     }
 
 
@@ -115,6 +121,7 @@ public class LoginActivity extends AppCompatActivity {
                             loginObj.getUser().getAddress(),
                             loginObj.getUser().getEmail(),
                             loginObj.getUser().getBirthday());
+
 
                     Toast.makeText(LoginActivity.this,"Xin chào, " +loginObj.getUser().getName() + "! 😎", Toast.LENGTH_SHORT).show();
                     Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);

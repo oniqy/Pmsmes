@@ -5,6 +5,7 @@ import static android.content.Context.MODE_PRIVATE;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -39,7 +40,35 @@ public class APIClient {
         editor.putString("birthday", birthday);
         editor.putString("email", email);
         editor.putString("address", address);
+        editor.putLong("LAST_LOGIN",System.currentTimeMillis());
         editor.apply();
+    }
+
+    public static String getLoggedinName(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE);
+        String name = prefs.getString("name", null);
+
+        return name;
+    }
+
+    public static String getLoggedinID(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE);
+        String id = prefs.getString("id", null);
+
+        return id;
+    }
+
+    public static boolean checkLastLogin(Context context){
+
+        SharedPreferences prefs = context.getSharedPreferences(SharedPrefs, MODE_PRIVATE);
+        String lastTime = prefs.getString("id", null);
+
+        if(!TextUtils.isEmpty(lastTime)) {
+           return true;
+        } else {
+            return false;
+        }
+
     }
 
 
