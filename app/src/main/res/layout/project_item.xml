@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="180dp"
-    android:layout_height="200dp"
+    android:layout_height="210dp"
     android:layout_margin="10dp"
     android:orientation="vertical">
 
@@ -23,6 +23,7 @@
         android:gravity="center_vertical"
         android:id="@+id/projectName"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
+        android:textStyle="bold"
         android:text="Oryza Systems" />
 </LinearLayout>

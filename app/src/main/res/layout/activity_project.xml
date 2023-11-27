@@ -6,12 +6,49 @@
     android:layout_height="match_parent"
     tools:context=".Controller.ProjectActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#0984E3"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    <TextView
+        android:id="@+id/title_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="0dp"
+        android:layout_weight="1"
+        android:gravity="center|left"
+        android:paddingLeft="15dp"
+        android:text="Workspace"
+        android:textColor="#FDFDFD"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/img_buttonOption"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#0984E3"
+
+        android:layout_marginEnd="15dp"
+        app:srcCompat="@drawable/baseline_more_horiz_24"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/projectRecycles"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:weightSum="10"/>
+        android:layout_marginTop="10dp"
+        android:weightSum="10"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:layout_editor_absoluteX="-10dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         app:layout_constraintBottom_toBottomOf="parent"

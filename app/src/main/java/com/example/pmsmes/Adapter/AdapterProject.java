@@ -2,6 +2,7 @@ package com.example.pmsmes.Adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.pmsmes.Controller.ProjectWorkspaceActivity;
 import com.example.pmsmes.ItemAdapter.Project;
 import com.example.pmsmes.R;
 
@@ -41,6 +43,15 @@ public class AdapterProject extends RecyclerView.Adapter<AdapterProject.ViewHold
 //        Resources resources = holder.itemView.getContext().getResources();
 //        @SuppressLint("DiscouragedApi") int background = resources.getIdentifier(project.getBackground(), "drawable", context.getPackageName());
 //        holder.projectBackground.setImageResource(background);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent projectView = new Intent(view.getContext(), ProjectWorkspaceActivity.class);
+                projectView.putExtra("projectID", project.getId());
+                view.getContext().startActivity(projectView);
+            }
+        });
     }
 
     @Override

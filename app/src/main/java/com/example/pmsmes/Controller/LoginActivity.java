@@ -2,6 +2,7 @@ package com.example.pmsmes.Controller;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView forgot_passBtn;
     Button loginBtn;
     EditText username_edt,password_edt;
-
+    ProgressDialog dialog;
     private APIInterface apiServices;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
         addEvents();
 
         if (APIClient.checkLastLogin(getApplicationContext())){
-            Toast.makeText(LoginActivity.this,"Xin chào, " + APIClient.getLoggedinName(this) + "! 😎", Toast.LENGTH_SHORT).show();
+            finish();
             Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
             startActivity(projectIntent);
         }
@@ -89,11 +90,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                dialog = ProgressDialog.show(LoginActivity.this, "",
+                        "Loading, please wait...", true);
+
                 String username = String.valueOf(username_edt.getText());
                 String password = String.valueOf(password_edt.getText());
 
                 if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)){
                     login(username,password);
+                }else{
+                    dialog.dismiss();
                 }
 
 
@@ -124,6 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
                     Toast.makeText(LoginActivity.this,"Xin chào, " +loginObj.getUser().getName() + "! 😎", Toast.LENGTH_SHORT).show();
+                    finish();
                     Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
                     startActivity(projectIntent);
                 }
@@ -133,6 +140,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onFailure(Call<Login> call, Throwable t) {
                 Toast.makeText(LoginActivity.this,"Có gì đó sai sai! Vui lòng kiểm tra lại", Toast.LENGTH_SHORT).show();
             }
+
         });
     }
 

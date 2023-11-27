@@ -1,44 +1,40 @@
 package com.example.pmsmes.Controller;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pmsmes.Adapter.AdapterProject;
 import com.example.pmsmes.ItemAdapter.Project;
-import com.example.pmsmes.ItemAdapter.User;
-import com.example.pmsmes.Models.Login;
 import com.example.pmsmes.R;
 import com.example.pmsmes.Utils.APIClient;
 import com.example.pmsmes.Utils.APIInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -53,6 +49,9 @@ public class ProjectActivity extends AppCompatActivity {
     Dialog dialog;
     APIInterface api;
 
+    TextView title_textView;
+    ImageButton img_buttonOption;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,9 +60,14 @@ public class ProjectActivity extends AppCompatActivity {
         showDialog();
         getAllProject();
         //dummy();
+
+
+
     }
 
     private void mapWidget() {
+        title_textView = findViewById(R.id.title_textView);
+        img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
         projectRecycles = findViewById(R.id.projectRecycles);
         projectPlus = findViewById(R.id.projectPlus);
         adapterProject = new AdapterProject(getApplicationContext(), projects);
@@ -71,6 +75,9 @@ public class ProjectActivity extends AppCompatActivity {
     }
 
     private void showDialog() {
+
+        title_textView.setText(APIClient.getLoggedinName(getApplicationContext()) + "'s workspace");
+
         projectPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,6 +108,60 @@ public class ProjectActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
+
+        img_buttonOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showOptionsMenu(view);
+            }
+        });
+    }
+
+    //show option Menu
+    @SuppressLint("ResourceType")
+    private void showOptionsMenu(View view) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        popupMenu.getMenuInflater().inflate(R.menu.menu_project, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                onOptionsItemSelected(item);
+                return true;
+            }
+        });
+        popupMenu.show();
+    }
+
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_item_logout) {
+            logOut();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logOut(){
+        api.logout(APIClient.getToken(getApplicationContext())).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    APIClient.logOut(getApplicationContext());
+                    finish();
+                    Intent loginActivity = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(loginActivity);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Có gì đó sai sai! Vui lòng thử lại", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void disableButton(EditText edit, Button button) {
@@ -160,6 +221,8 @@ public class ProjectActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Có gì đó sai sai! Xin vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
@@ -182,6 +245,8 @@ public class ProjectActivity extends AppCompatActivity {
         api.createNewProject(APIClient.getToken(getApplicationContext()), name, "", APIClient.getUserID(getApplicationContext())).enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
+
+                APIClient.logData(response.body());
                 if (response.isSuccessful()){
                     getAllProject();
                 }
@@ -190,6 +255,7 @@ public class ProjectActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
                 Toast.makeText(getApplicationContext(),"Có gì đó sai sai! Vui lòng kiểm tra lại", Toast.LENGTH_SHORT).show();
+                Log.d("aki", t.getMessage());
             }
         });
 

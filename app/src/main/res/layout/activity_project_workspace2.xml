@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:gravity="center|left"
             android:paddingLeft="15dp"
-            android:text="ProjectName"
+            android:text=""
             android:textColor="#FDFDFD"
             android:textSize="25sp"
             android:textStyle="bold" />

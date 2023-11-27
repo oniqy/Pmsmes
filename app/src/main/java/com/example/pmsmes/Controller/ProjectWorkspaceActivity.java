@@ -1,6 +1,8 @@
 package com.example.pmsmes.Controller;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
@@ -8,21 +10,33 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import androidx.recyclerview.widget.SnapHelper;
 
+import com.example.pmsmes.Adapter.AdapterMember;
 import com.example.pmsmes.Adapter.AdapterStage;
 import com.example.pmsmes.Adapter.ItemMoveStage;
 import com.example.pmsmes.ItemAdapter.ItemStage;
+import com.example.pmsmes.ItemAdapter.Project;
+import com.example.pmsmes.ItemAdapter.User;
 import com.example.pmsmes.R;
 import com.example.pmsmes.Utils.APIClient;
 import com.example.pmsmes.Utils.APIInterface;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +45,14 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProjectWorkspaceActivity extends AppCompatActivity {
     RecyclerView recyc_Stage;
@@ -42,17 +64,25 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     ArrayList<String> lstname= new ArrayList<>();
     TextView projectName;
     private APIInterface apiServices;
-    String demoProjectID = "6552e8416bbf6b45d1036429";
+    String projectID = "";
+    Project project = new Project();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_project_workspace2);
 
+        Intent i = getIntent();
+        projectID = i.getStringExtra("projectID");
+
+
         addControls();
         addEvents();
-        APIClient.setToken(this, "");
+
         //apiServices Setup
         apiServices = APIClient.getClient().create(APIInterface.class);
+
+        loadProjectData(projectID);
     }
 
 
@@ -62,6 +92,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     }
 
     private void addEvents(){
+
         img_buttonOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +100,76 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void loadProjectData(String projectID){
+        apiServices.getProjectByID(APIClient.getToken(getApplicationContext()),projectID).enqueue(new Callback<Object>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                //Xử lý dữ liệu ở đây
+                if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+
+                        project.setId(apiResult.getJSONObject("data").getString("_id"));
+                        project.setName(apiResult.getJSONObject("data").getString("name"));
+                        project.setDescription(apiResult.getJSONObject("data").getString("description"));
+                        project.setId(apiResult.getJSONObject("data").getString("_id"));
+
+                        SimpleDateFormat formatter1=new SimpleDateFormat("dd/MM/yyyy");
+                        project.setStartAt(formatter1.parse(APIClient.convertMongoDate(apiResult.getJSONObject("data").getString("startAt"))));
+                        project.setEndAt(formatter1.parse(APIClient.convertMongoDate(apiResult.getJSONObject("data").getString("endAt"))));
+
+                        ArrayList<User> members = new ArrayList<User>();
+                        JSONArray memberInResult = apiResult.getJSONObject("data").getJSONArray("members");
+
+                        for (int i=0; i< memberInResult.length(); i++){
+                            User member = new User();
+
+                            member.setName(memberInResult.getJSONObject(i).getString("name"));
+                            member.setEmail(memberInResult.getJSONObject(i).getString("email"));
+                            member.setId(memberInResult.getJSONObject(i).getString("id"));
+
+                            members.add(member);
+
+                        }
+                        project.setMembers(members);
+                        projectName.setText(project.getName());
+
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void getProjectStages(String projectID){
+        apiServices.getProjectStages(APIClient.getToken(getApplicationContext()), projectID).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void setupRecycleView(){
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
@@ -146,7 +247,14 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         View dialogView = inflater.inflate(R.layout.dialog_addmember,null);
         EditText edt_email = dialogView.findViewById(R.id.edt_email);
         ListView listView = dialogView.findViewById(R.id.list_email);
-        RecyclerView listAavatar = dialogView.findViewById(R.id.list_avatar);
+        ListView listAavatar = dialogView.findViewById(R.id.list_avatar);
+
+        AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
+                R.layout.item_email,
+                project.getMembers());
+
+        listAavatar.setAdapter(adapterMember);
+
         builder.setView(dialogView)
                 .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
                     @Override
