@@ -67,11 +67,11 @@ public class LoginActivity extends AppCompatActivity {
         addControls();
         addEvents();
 
-        if (APIClient.checkLastLogin(getApplicationContext())){
-            finish();
-            Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
-            startActivity(projectIntent);
-        }
+//        if (APIClient.checkLastLogin(getApplicationContext())){
+//            finish();
+//            Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
+//            startActivity(projectIntent);
+//        }
 
     }
 

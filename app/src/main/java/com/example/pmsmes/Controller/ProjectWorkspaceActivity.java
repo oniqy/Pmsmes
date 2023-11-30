@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 import android.widget.PopupMenu;
@@ -22,6 +23,7 @@ import android.widget.PopupMenu;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Locale;
 
 import androidx.recyclerview.widget.SnapHelper;
@@ -31,6 +33,9 @@ import com.example.pmsmes.Adapter.AdapterStage;
 import com.example.pmsmes.Adapter.ItemMoveStage;
 import com.example.pmsmes.ItemAdapter.ItemStage;
 import com.example.pmsmes.ItemAdapter.Project;
+import com.example.pmsmes.ItemAdapter.Stage;
+import com.example.pmsmes.ItemAdapter.Tag;
+import com.example.pmsmes.ItemAdapter.Task;
 import com.example.pmsmes.ItemAdapter.User;
 import com.example.pmsmes.R;
 import com.example.pmsmes.Utils.APIClient;
@@ -60,8 +65,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     AdapterStage adapterStage;
     ImageButton img_buttonOption;
     String stageName;
-    ArrayList<String> lstStage = new ArrayList<>();
-    ArrayList<String> lstname= new ArrayList<>();
+    ArrayList<Stage> projectStageList = new ArrayList<>();
+    ArrayList<Task> projectTaskList = new ArrayList<>();
     TextView projectName;
     private APIInterface apiServices;
     String projectID = "";
@@ -138,6 +143,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                         project.setMembers(members);
                         projectName.setText(project.getName());
 
+                        //LOAD STAGES
+                        getProjectStages(project.getId());
 
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
@@ -159,6 +166,34 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONArray stagesList = apiResult.getJSONArray("data");
+
+                        for(int i=0; i < stagesList.length(); i++) {
+                            Stage stage = new Stage();
+
+                            stage.setProject(project.getId());
+                            stage.setId(stagesList.getJSONObject(i).getString("_id"));
+                            stage.setName(stagesList.getJSONObject(i).getString("name"));
+                            stage.setIsCancel(stagesList.getJSONObject(i).getBoolean("isCancel"));
+                            stage.setIsDone(stagesList.getJSONObject(i).getBoolean("isDone"));
+                            stage.setSequence(stagesList.getJSONObject(i).getInt("sequence"));
+                            projectStageList.add(stage);
+                        }
+
+                        //Sort theo sequence
+                        projectStageList.sort(Comparator.comparingInt(o -> o.getSequence()));
+                        getStageTasks();
+
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
 
                 }
             }
@@ -170,12 +205,89 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         });
     }
 
+
+    private void getStageTasks(){
+        apiServices.getProjectTask(APIClient.getToken(getApplicationContext()),
+                projectStageList.get(0).getProject()).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONArray data = apiResult.getJSONArray("data");
+
+                        for (int i=0; i< data.length(); i++){
+
+                            Task task = new Task();
+                            task.setId(data.getJSONObject(i).getString("_id"));
+                            task.setName(data.getJSONObject(i).getString("name"));
+
+                            //Xử lý creator
+                            JSONObject creatorInfo = data.getJSONObject(i).getJSONObject("creator");
+                            User creatorOb = new User();
+                            creatorOb.setId(creatorInfo.getString("_id"));
+                            creatorOb.setName(creatorInfo.getString("name"));
+                            creatorOb.setEmail(creatorInfo.getString("email"));
+                            task.setCreator(creatorOb);
+
+                            //Xử lý assignee
+                            ArrayList<User> assignee = new ArrayList<User>();
+                            JSONArray assigneeList = data.getJSONObject(i).getJSONArray("assignee");
+
+                            for (int j =0; j< assigneeList.length();j++) {
+                                User member = new User();
+                                member.setId(assigneeList.getJSONObject(i).getString("_id"));
+                                member.setName(assigneeList.getJSONObject(i).getString("name"));
+                                member.setEmail(assigneeList.getJSONObject(i).getString("email"));
+                                assignee.add(member);
+                            }
+                            task.setAssignee(assignee);
+
+                            //Xử lý stage
+                            task.setStage(data.getJSONObject(i).getJSONObject("stage").getString("_id"));
+
+                            //Tags
+                            ArrayList<Tag> tags = new ArrayList<Tag>();
+                            JSONArray tagList = data.getJSONObject(i).getJSONArray("tags");
+
+                            for (int j =0; j< tagList.length();j++) {
+                                Tag tag = new Tag();
+                                tag.setId(tagList.getJSONObject(i).getString("_id"));
+                                tag.setName(tagList.getJSONObject(i).getString("name"));
+                                tag.setProject(tagList.getJSONObject(i).getString("project"));
+                                tag.setColor(tagList.getJSONObject(i).getString("color"));
+
+                                tags.add(tag);
+                            }
+
+                            task.setTags(tags);
+
+                            //Add to global list;
+                            projectTaskList.add(task);
+                        }
+
+                        setupRecycleView();
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void setupRecycleView(){
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
         //set adapter recyclerView
-        itemStages = ItemStage.inititStage(lstname);
-        adapterStage =new AdapterStage(itemStages,this);
+        adapterStage =new AdapterStage(projectStageList,projectTaskList,this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
 
