@@ -33,7 +33,16 @@ public interface APIInterface {
     @GET("/api/project/{id}/members")
     Call<Object> getProjectMemberList(@Header("Authorization") String token, @Path("id") String projectId);
 
+    @GET("/api/project/{id}/members/getUsers")
+    Call<Object> getNotInProjectUserList(@Header("Authorization") String token, @Path("id") String projectId);
 
+    @FormUrlEncoded
+    @POST("/api/project/{id}/members")
+    Call<Object> addMemberToProject(@Header("Authorization") String token, @Path("id") String projectId,@Field("user") String userID);
+
+    @FormUrlEncoded
+    @DELETE("/api/project/{id}/members")
+    Call<Object> removeMemberFromProject(@Header("Authorization") String token, @Path("id") String projectId,@Field("user") String userID);
 
     //Stage
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
@@ -46,6 +55,10 @@ public interface APIInterface {
 
     @PATCH("/api/project/{id}/stages")
     Call<Object> updateProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Body Object body);
+
+    @FormUrlEncoded
+    @PATCH("/api/project/{id}/stages")
+    Call<Object> removeProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Field("stage") String stageID);
 
     //TASK
     @GET("/api/project/{id}/tasks")
@@ -62,8 +75,26 @@ public interface APIInterface {
     @PATCH("/api/project/{id}/tasks/assign")
     Call<Object> assignTask(@Header("Authorization") String token, @Field("task") String taskID, @Field("assignee") String[] memberToAssignList);
 
-//    @DELETE("/api/project/{id}/tasks/")
-//    Call<Object> deleteTask(@Header("Authorization") String token,)
+    @FormUrlEncoded
+    @DELETE("/api/project/{id}/tasks/")
+    Call<Object> removeTask(@Header("Authorization") String token, @Path("id") String projectId,@Field("task") String taskID);
+
+
+    //TAG
+    @GET("/api/project/{id}/tags")
+    Call<Object> getProjectTag(@Header("Authorization") String token, @Path("id") String projectId);
+
+    @FormUrlEncoded
+    @POST("/api/project/{id}/tags")
+    Call<Object> createProjectTag(@Header("Authorization") String token, @Path("id") String projectId, @Field("name") String tagName, @Field("color") String colorHEX);
+
+    @FormUrlEncoded
+    @PATCH("/api/project/{id}/tags")
+    Call<Object> updateProjectTag(@Header("Authorization") String token, @Path("id") String projectId, @Field("tag") String tagID, @Body Object body);
+
+    @FormUrlEncoded
+    @DELETE("/api/project/{id}/tags")
+    Call<Object> removeProjectTag(@Header("Authorization") String token, @Path("id") String projectId, @Field("tag") String tagID);
 
     //User
     @GET("/api/users/{id}/project")
@@ -84,4 +115,6 @@ public interface APIInterface {
 
     @GET("/api/account/logout")
     Call<Object> logout(@Header("Authorization") String token);
+
+
 }
