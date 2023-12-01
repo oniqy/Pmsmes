@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 
@@ -65,8 +66,10 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     AdapterStage adapterStage;
     ImageButton img_buttonOption;
     String stageName;
+    String getEmail;
     ArrayList<Stage> projectStageList = new ArrayList<>();
     ArrayList<Task> projectTaskList = new ArrayList<>();
+    ArrayList<User> usersList = new ArrayList<>();
     TextView projectName;
     private APIInterface apiServices;
     String projectID = "";
@@ -367,20 +370,69 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_addmember,null);
         EditText edt_email = dialogView.findViewById(R.id.edt_email);
-        ListView listView = dialogView.findViewById(R.id.list_email);
+        ListView listEmail = dialogView.findViewById(R.id.list_email);
         ListView listAavatar = dialogView.findViewById(R.id.list_avatar);
-
+        String[] idMember = {null};
         AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
                 R.layout.item_email,
                 project.getMembers());
-
         listAavatar.setAdapter(adapterMember);
+        apiServices.getNotInProjectUserList(APIClient.getToken(getApplicationContext()),projectID)
+                .enqueue(new Callback<Object>() {
+                    @Override
+                    public void onResponse(Call<Object> call, Response<Object> response) {
+                        getEmail = edt_email.getText().toString();
+                        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                        String strObj = gson.toJson(response.body());
+                        User user ;
+                        try {
+                            JSONObject apiResult = new JSONObject(strObj);
+                            JSONArray data = apiResult.getJSONArray("data");
+                            for(int i = 0; i< data.length();i++){
+                                user = new User();
+                                user.setName(data.getJSONObject(i).getString("name"));
+                                user.setId(data.getJSONObject(i).getString("_id"));
+                                user.setEmail(data.getJSONObject(i).getString("email"));
+                                usersList.add(user);
+                            }
+                            AdapterMember adapterMember1 = new AdapterMember(getApplicationContext(),
+                                    R.layout.item_email,usersList);
+                            listEmail.setAdapter(adapterMember1);
+                            listEmail.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    edt_email.setText(usersList.get(i).getEmail());
+                                    idMember[0] = usersList.get(i).getId();
+                                    Toast.makeText(getApplicationContext(),usersList.get(i).getEmail(),Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<Object> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(),"Co gi do sai sai",Toast.LENGTH_LONG).show();
+
+                    }
+                });
 
         builder.setView(dialogView)
                 .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        apiServices.addMemberToProject(APIClient.getToken(getApplicationContext()),projectID,idMember[0])
+                                .enqueue(new Callback<Object>() {
+                                    @Override
+                                    public void onResponse(Call<Object> call, Response<Object> response) {
+                                        Toast.makeText(getApplicationContext(),"Đã gửi lời mời",Toast.LENGTH_LONG).show();
+                                    }
 
+                                    @Override
+                                    public void onFailure(Call<Object> call, Throwable t) {
+
+                                    }
+                                });
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -392,7 +444,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
