@@ -6,4 +6,8 @@
         android:id="@+id/menu_item_removeStage"
         android:title="Remove stage"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_EditStage"
+        android:title="Edit stage"
+        app:showAsAction="never" />
 </menu>

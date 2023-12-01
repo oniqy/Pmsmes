@@ -204,8 +204,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
-
-
     private void getStageTasks(){
         apiServices.getProjectTask(APIClient.getToken(getApplicationContext()),
                 projectStageList.get(0).getProject()).enqueue(new Callback<Object>() {
@@ -329,17 +327,28 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         stageName = edt_stageName.getText().toString().trim();
-                        if (!stageName.isEmpty()) {
-                            ItemStage itemStage = new ItemStage();
-                            itemStage.tvStageName = stageName;
-                            itemStages.add(itemStage);
-                            adapterStage.notifyDataSetChanged();
-                            Toast.makeText(getApplicationContext(), "New Stage Added", Toast.LENGTH_LONG).show();
-                            // Handle non-empty stageName
-                        } else {
-                            // Handle empty stageName or display a message
-                            Toast.makeText(getApplicationContext(), "Stage name cannot be empty", Toast.LENGTH_SHORT).show();
-                        }
+                        apiServices.createNewStage(APIClient.getToken(getApplicationContext()),projectID,stageName)
+                                .enqueue(new Callback<Object>() {
+                                    @Override
+                                    public void onResponse(Call<Object> call, Response<Object> response) {
+                                        if (!stageName.isEmpty()) {
+                                            ItemStage itemStage = new ItemStage();
+                                            itemStage.tvStageName = stageName;
+                                            itemStages.add(itemStage);
+                                            adapterStage.notifyDataSetChanged();
+                                            Toast.makeText(getApplicationContext(), "New Stage Added",
+                                                    Toast.LENGTH_LONG).show();
+                                        } else {
+                                            // Handle empty stageName or display a message
+                                            Toast.makeText(getApplicationContext(), "Stage name cannot be empty", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Object> call, Throwable t) {
+                                        Toast.makeText(getApplicationContext(), "Co gi do sai sai", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
