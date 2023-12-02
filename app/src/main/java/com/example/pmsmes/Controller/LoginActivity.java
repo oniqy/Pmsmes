@@ -130,6 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
                     Toast.makeText(LoginActivity.this,"Xin chào, " +loginObj.getUser().getName() + "! 😎", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
                     finish();
                     Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
                     startActivity(projectIntent);
@@ -138,6 +139,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Login> call, Throwable t) {
+                dialog.dismiss();
                 Toast.makeText(LoginActivity.this,"Có gì đó sai sai! Vui lòng kiểm tra lại", Toast.LENGTH_SHORT).show();
             }
 
