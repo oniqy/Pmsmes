@@ -8,6 +8,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
@@ -57,9 +58,9 @@ public interface APIInterface {
     @PATCH("/api/project/{id}/stages")
     Call<Object> updateProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Body Object body);
 
-    @FormUrlEncoded
-    @PATCH("/api/project/{id}/stages")
-    Call<Object> removeProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Field("stage") String stageID);
+
+    @HTTP(method = "DELETE", path = "/api/project/{id}/stages", hasBody = true )
+    Call<Object> removeProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Body Object stageID);
 
     //TASK
     @GET("/api/project/{id}/tasks")

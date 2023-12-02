@@ -249,8 +249,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                             }
                             task.setAssignee(assignee);
 
-                            //Xử lý stage
-                            task.setStage(data.getJSONObject(i).getJSONObject("stage").getString("_id"));
+
+
 
                             //Tags
                             ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -269,7 +269,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                             task.setTags(tags);
 
                             //Add to global list;
-                            projectTaskList.add(task);
+                            //Xử lý stage
+                            if (data.getJSONObject(i).has("stage")){
+                                task.setStage(data.getJSONObject(i).getJSONObject("stage").getString("_id"));
+                                projectTaskList.add(task);
+                            }
+
                         }
 
                         setupRecycleView();

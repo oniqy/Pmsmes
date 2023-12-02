@@ -15,6 +15,7 @@ import com.example.pmsmes.Utils.APIClient;
 import com.example.pmsmes.Utils.APIInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -234,28 +235,39 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
             public boolean onMenuItemClick(MenuItem item) {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_item_removeStage) {
-                Toast.makeText(view.getContext(),"NOT IMPLEMENTED!",Toast.LENGTH_SHORT).show();
-//                    apiServices.removeProjectStage(APIClient.getToken(view.getContext()),
-//                            itemStage.get(position).getProject(),itemStage.get(position).getId()).enqueue(new Callback<Object>() {
-//                        @Override
-//                        public void onResponse(Call<Object> call, Response<Object> response) {
-//                            if (response.isSuccessful()){
-//                                Toast.makeText(view.getContext(),"Stage deleted.",Toast.LENGTH_SHORT).show();
-//                                itemStage.remove(position);
-//                                notifyItemRemoved(position);
-//                            }
-//                        }
-//                        @Override
-//                        public void onFailure(Call<Object> call, Throwable t) {
-//                            Toast.makeText(view.getContext(),"Failed to delete.",Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
+                    Toast.makeText(view.getContext(),"NOT IMPLEMENTED!",Toast.LENGTH_SHORT).show();
+                    JsonObject stageRequest = new JsonObject ();
+                    stageRequest.addProperty("stage" , itemStage.get(position).getId());
+                    logData(stageRequest);
+                    apiServices.removeProjectStage(APIClient.getToken(view.getContext()),
+                            itemStage.get(position).getProject(),stageRequest).enqueue(new Callback<Object>() {
+                        @Override
+                        public void onResponse(Call<Object> call, Response<Object> response) {
+                            if (response.isSuccessful()){
+                                Toast.makeText(view.getContext(),"Stage deleted.",Toast.LENGTH_SHORT).show();
+                                itemStage.remove(position);
+                                notifyItemRemoved(position);
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<Object> call, Throwable t) {
+                            Toast.makeText(view.getContext(),"Failed to delete.",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
 
                 }
                 return true;
             }
         });
         popupMenu.show();
+    }
+
+
+    private void logData(Object object){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String prettyJsonString = gson.toJson(object);
+        Log.d("Akkii", prettyJsonString);
     }
 
     @Override
