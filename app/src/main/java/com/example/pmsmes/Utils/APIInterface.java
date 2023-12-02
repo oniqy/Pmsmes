@@ -13,6 +13,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface APIInterface {
 
@@ -40,9 +41,9 @@ public interface APIInterface {
     @POST("/api/project/{id}/members")
     Call<Object> addMemberToProject(@Header("Authorization") String token, @Path("id") String projectId,@Field("user") String userID);
 
-    @FormUrlEncoded
+
     @DELETE("/api/project/{id}/members")
-    Call<Object> removeMemberFromProject(@Header("Authorization") String token, @Path("id") String projectId,@Field("user") String userID);
+    Call<Object> removeMemberFromProject(@Header("Authorization") String token, @Path("id") String projectId,@Query("user") String userID);
 
     //Stage
     @Headers({ "Content-Type: application/json;charset=UTF-8"})

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Pmsmes</string>
     <string name="AddStage">Add Stage</string>
+    <string name="remove_Member">Remove Member</string>
+    <string name="remove">Remove</string>
     <string name="AddMember">Add Member</string>
     <string name="cancel">cancel</string>
 </resources>

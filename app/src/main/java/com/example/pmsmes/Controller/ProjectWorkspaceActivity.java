@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -303,8 +305,38 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         SnapHelper snapHelper = new LinearSnapHelper();
         snapHelper.attachToRecyclerView(recyc_Stage);
     }
+    private void showRemoveMemberDialog(String idMember,String email,int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_removemember, null);
+        builder.setView(dialogView).setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                apiServices.removeMemberFromProject(APIClient.getToken(getApplicationContext()),projectID,idMember)
+                        .enqueue(new Callback<Object>() {
+                            @Override
+                            public void onResponse(Call<Object> call, Response<Object> response) {
+                                if (response.isSuccessful()){
+                                    project.getMembers().remove(position).getId();
+                                    Toast.makeText(getApplicationContext(),"Đã xóa "+email+" ra khỏi dự án",Toast.LENGTH_LONG).show();
+                                }
+                            }
 
+                            @Override
+                            public void onFailure(Call<Object> call, Throwable t) {
 
+                            }
+                        });
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
     //show option Menu
     @SuppressLint("ResourceType")
     private void showOptionsMenu(View view) {
@@ -372,11 +404,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         EditText edt_email = dialogView.findViewById(R.id.edt_email);
         ListView listEmail = dialogView.findViewById(R.id.list_email);
         ListView listAavatar = dialogView.findViewById(R.id.list_avatar);
-        String[] idMember = {null};
+        String[] AddIdMember = {null};
         AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
                 R.layout.item_email,
                 project.getMembers());
         listAavatar.setAdapter(adapterMember);
+
         apiServices.getNotInProjectUserList(APIClient.getToken(getApplicationContext()),projectID)
                 .enqueue(new Callback<Object>() {
                     @Override
@@ -384,16 +417,18 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                         getEmail = edt_email.getText().toString();
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         String strObj = gson.toJson(response.body());
-                        User user ;
+                        ArrayList<User> memberNotIn = new ArrayList<>();
                         try {
                             JSONObject apiResult = new JSONObject(strObj);
                             JSONArray data = apiResult.getJSONArray("data");
                             for(int i = 0; i< data.length();i++){
-                                user = new User();
+                                User user = new User();
                                 user.setName(data.getJSONObject(i).getString("name"));
                                 user.setId(data.getJSONObject(i).getString("_id"));
                                 user.setEmail(data.getJSONObject(i).getString("email"));
-                                usersList.add(user);
+                                memberNotIn.add(user);
+                                usersList.clear();
+                                usersList.addAll(memberNotIn);
                             }
                             AdapterMember adapterMember1 = new AdapterMember(getApplicationContext(),
                                     R.layout.item_email,usersList);
@@ -402,8 +437,15 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                 @Override
                                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                                     edt_email.setText(usersList.get(i).getEmail());
-                                    idMember[0] = usersList.get(i).getId();
+                                    AddIdMember[0] = usersList.get(i).getId();
                                     Toast.makeText(getApplicationContext(),usersList.get(i).getEmail(),Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            listAavatar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                    showRemoveMemberDialog(project.getMembers().get(i).getId(),project.getMembers().get(i).getEmail(),i);
+
                                 }
                             });
                         } catch (JSONException e) {
@@ -421,10 +463,11 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        apiServices.addMemberToProject(APIClient.getToken(getApplicationContext()),projectID,idMember[0])
+                        apiServices.addMemberToProject(APIClient.getToken(getApplicationContext()),projectID,AddIdMember[0])
                                 .enqueue(new Callback<Object>() {
                                     @Override
                                     public void onResponse(Call<Object> call, Response<Object> response) {
+
                                         Toast.makeText(getApplicationContext(),"Đã gửi lời mời",Toast.LENGTH_LONG).show();
                                     }
 
