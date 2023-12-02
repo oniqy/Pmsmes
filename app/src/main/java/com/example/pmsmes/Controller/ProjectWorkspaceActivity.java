@@ -376,7 +376,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                             itemStage.tvStageName = stageName;
                                             itemStages.add(itemStage);
                                             adapterStage.notifyDataSetChanged();
-                                            Toast.makeText(getApplicationContext(), "New Stage Added",
+                                            Toast.makeText(getApplicationContext(), "New stage added",
                                                     Toast.LENGTH_LONG).show();
                                         } else {
                                             // Handle empty stageName or display a message

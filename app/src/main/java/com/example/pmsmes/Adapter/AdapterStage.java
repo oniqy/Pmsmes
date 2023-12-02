@@ -235,7 +235,6 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
             public boolean onMenuItemClick(MenuItem item) {
                 int itemId = item.getItemId();
                 if (itemId == R.id.menu_item_removeStage) {
-                    Toast.makeText(view.getContext(),"NOT IMPLEMENTED!",Toast.LENGTH_SHORT).show();
                     JsonObject stageRequest = new JsonObject ();
                     stageRequest.addProperty("stage" , itemStage.get(position).getId());
                     logData(stageRequest);
