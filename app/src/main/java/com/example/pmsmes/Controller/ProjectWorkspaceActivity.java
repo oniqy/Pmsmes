@@ -192,7 +192,9 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
                         //Sort theo sequence
                         projectStageList.sort(Comparator.comparingInt(o -> o.getSequence()));
-                        getStageTasks();
+                        if (projectStageList.size()>0){
+                            getStageTasks();
+                        }
 
 
                     } catch (JSONException e) {
@@ -375,7 +377,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                             ItemStage itemStage = new ItemStage();
                                             itemStage.tvStageName = stageName;
                                             itemStages.add(itemStage);
-                                            adapterStage.notifyDataSetChanged();
+                                            //adapterStage.notifyDataSetChanged();
                                             Toast.makeText(getApplicationContext(), "New stage added",
                                                     Toast.LENGTH_LONG).show();
                                         } else {
