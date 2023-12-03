@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import androidx.recyclerview.widget.SnapHelper;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.pmsmes.Adapter.AdapterMember;
 import com.example.pmsmes.Adapter.AdapterStage;
@@ -76,6 +77,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     private APIInterface apiServices;
     String projectID = "";
     Project project = new Project();
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +100,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
     private void addControls(){
         projectName = findViewById(R.id.projectName);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
     }
 
@@ -292,7 +295,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
-
+    private boolean isSnapHelperAttached = false;
     private void setupRecycleView(){
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
@@ -309,8 +312,11 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         recyc_Stage.setAdapter(adapterStage);
 
         //Snap item recyclerView
-        SnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(recyc_Stage);
+        if (!isSnapHelperAttached) {
+            SnapHelper snapHelper = new LinearSnapHelper();
+            snapHelper.attachToRecyclerView(recyc_Stage);
+            isSnapHelperAttached = true;
+        }
     }
     private void showRemoveMemberDialog(String idMember,String email,int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

@@ -76,6 +76,16 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     //SelectItemTask
     public void onTaskItemClick(int stagePosition, int taskPosition) {
         Intent edtTask = new Intent(context, EditTask_Activity.class);
+        edtTask.putExtra("projectID",itemStage.get(0).getProject());
+        ArrayList<Task> getIdTask = new ArrayList<>();
+        for(Task task : itemTask){
+           if(task.getStage().equals(itemStage.get(stagePosition-1).getId())){
+               getIdTask.add(task);
+           }
+        }
+        edtTask.putExtra("stageID",itemStage.get(stagePosition-1).getId());
+        edtTask.putExtra("taskID",getIdTask.get(taskPosition).getId());
+        edtTask.putExtra("taskName",getIdTask.get(taskPosition).getName());
         context.startActivity(edtTask.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
     @NonNull

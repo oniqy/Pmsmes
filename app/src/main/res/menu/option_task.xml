@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_item_removeTask"
+        android:title="Remove Task"
+        app:showAsAction="never"
+        android:icon="@drawable/baseline_add_card_24"
+        />
+    <item
+        android:id="@+id/menu_item_assignTask"
+        android:title="Assign Task"
+        app:showAsAction="never"
+        android:icon="@drawable/baseline_add_card_24"
+        />
+</menu>

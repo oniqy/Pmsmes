@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
     android:background="@drawable/bkui"
     tools:context=".Controller.EditTask_Activity">
 
@@ -17,37 +16,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:background="#0984E3"
         android:orientation="horizontal">
 
       <ImageButton
-          android:id="@+id/imageButton2"
+          android:id="@+id/btn_back"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:background="@drawable/border_lightgraybox"
           android:layout_gravity="center_vertical"
-          app:srcCompat="@drawable/left" />
+          android:layout_weight="1"
+          android:background="#0984E3"
+          app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
 
       <TextView
           android:id="@+id/ET_taskName"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:textSize="10pt"
-          android:textColor="#0984E3"
           android:layout_gravity="center_vertical"
+          android:layout_weight="1"
           android:gravity="center"
           android:paddingHorizontal="15dp"
-          android:text="Task name" />
+          android:text="Task name"
+          android:textColor="@color/white"
+          android:textSize="10pt" />
 
       <ImageButton
-          android:id="@+id/imageButton3"
+          android:id="@+id/btnoption"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:background="@drawable/border_lightgraybox"
           android:layout_gravity="center_vertical"
-          app:srcCompat="@drawable/dots" />
+          android:layout_weight="1"
+          android:background="#0984E3"
+          app:srcCompat="@drawable/baseline_more_horiz_24"
+          tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
     </LinearLayout>
 
     <RelativeLayout
@@ -58,111 +59,134 @@
           android:id="@+id/ET_name"
           android:layout_width="150dp"
           android:layout_height="wrap_content"
-          android:textSize="8pt"
+          android:layout_marginLeft="15dp"
           android:layout_marginTop="20dp"
-          android:textColor="@color/white"
-          android:text="Task name" />
+          android:text="Task name"
 
-      <TextView
+          android:textColor="@color/white"
+          android:textSize="8pt" />
+
+      <EditText
           android:id="@+id/ET_taskName_1"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:background="@drawable/border_lightgraybox"
-          android:layout_toRightOf="@+id/ET_name"
-          android:textSize="8pt"
           android:layout_marginTop="20dp"
+          android:layout_marginRight="15dp"
+
           android:layout_marginBottom="15dp"
+          android:layout_toRightOf="@+id/ET_name"
+          android:background="@drawable/layout_task"
           android:paddingLeft="5dp"
           android:paddingRight="5dp"
-          android:text="nhap cai taskname vao day, test luon 2 dong, test 3 dong luon cho no ri pon sip" />
+          android:textSize="8pt" />
 
       <TextView
           android:id="@+id/textView6"
           android:layout_width="150dp"
           android:layout_height="wrap_content"
           android:layout_below="@+id/ET_taskName_1"
-          android:textSize="8pt"
+          android:layout_marginLeft="15dp"
+          android:text="Stage: "
           android:textColor="@color/white"
-          android:text="Stage: " />
+          android:textSize="8pt" />
 
-      <TextView
+      <Spinner
           android:id="@+id/ET_stageName"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_toRightOf="@+id/textView6"
           android:layout_below="@+id/ET_taskName_1"
-          android:textSize="8pt"
-          android:textColor="#EF3E3E"
-          android:textStyle="bold"
-          android:background="@drawable/border_lightgraybox"
-          android:paddingVertical="5dp"
-          android:paddingHorizontal="7dp"
           android:layout_marginBottom="15dp"
-          android:text="Pending" />
+          android:layout_toRightOf="@+id/textView6"
+          android:background="@drawable/layout_task"
+          android:dropDownVerticalOffset="50dp"
+          android:paddingTop="20dp"
+          android:textAlignment="gravity" />
 
       <TextView
           android:id="@+id/textView8"
           android:layout_width="150dp"
           android:layout_height="wrap_content"
           android:layout_below="@+id/ET_stageName"
-          android:textSize="8pt"
+          android:layout_marginLeft="15dp"
+          android:text="Created by: "
           android:textColor="@color/white"
-          android:text="Created by: " />
+          android:textSize="8pt" />
 
       <TextView
           android:id="@+id/ET_createdName"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:background="@drawable/border_lightgraybox"
           android:layout_below="@+id/ET_stageName"
-          android:textStyle="italic"
-          android:textSize="8pt"
-          android:paddingVertical="5dp"
-          android:paddingHorizontal="7dp"
           android:layout_marginBottom="15dp"
           android:layout_toRightOf="@+id/textView8"
-          android:text="BeanieQ ngu ngoc" />
+          android:background="@drawable/layout_task"
+          android:paddingHorizontal="7dp"
+          android:paddingVertical="5dp"
+          android:text="BeanieQ ngu ngoc"
+          android:textSize="8pt"
+          android:textStyle="italic" />
 
-      <RelativeLayout
+      <androidx.constraintlayout.widget.ConstraintLayout
           android:id="@+id/ET_people"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="horizontal"
-          android:background="@drawable/border_lightgraybox"
           android:layout_below="@+id/ET_createdName"
-          >
+          android:layout_marginLeft="15dp"
+          android:layout_marginRight="15dp"
+          android:background="@drawable/layout_task"
+          android:orientation="horizontal">
 
 
         <ImageButton
             android:id="@+id/iconPeople"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginVertical="20dp"
-            android:layout_marginLeft="15dp"
-            app:srcCompat="@drawable/user_01" />
+            android:layout_marginTop="10dp"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/baseline_group_24"
+            tools:ignore="MissingConstraints" />
+
+        <ListView
+            android:id="@+id/list_assignee"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_toRightOf="@+id/iconPeople"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iconPeople" />
 
         <ImageButton
             android:id="@+id/imgBtn_addPeople"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginVertical="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:src="@drawable/baseline_add_circle_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/list_assignee" />
 
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@+id/iconPeople"
-            app:srcCompat="@drawable/plus" />
 
-
-      </RelativeLayout>
+      </androidx.constraintlayout.widget.ConstraintLayout>
 
       <RelativeLayout
           android:id="@+id/ET_Label"
           android:layout_width="match_parent"
-          android:layout_height="match_parent"
+          android:layout_height="60dp"
           android:layout_below="@+id/ET_people"
-          android:background="@drawable/border_lightgraybox"
-          android:layout_marginTop="20dp">
+          android:layout_marginLeft="15dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginRight="15dp"
+          android:background="@drawable/layout_task">
 
 
         <ImageView
@@ -170,49 +194,52 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginVertical="20dp"
             android:layout_marginLeft="15dp"
-            app:srcCompat="@drawable/list" />
+            app:srcCompat="@drawable/baseline_format_list_bulleted_24" />
 
         <TextView
             android:id="@+id/textView11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/imageView4"
-            android:textSize="10pt"
             android:layout_centerVertical="true"
-            android:textStyle="bold"
-            android:layout_marginLeft="30dp"
-            android:text="Label" />
+            android:layout_marginLeft="15dp"
+            android:layout_toRightOf="@+id/imageView4"
+            android:text="Label"
+            android:textColor="#0984E3"
+            android:textSize="10pt"
+            android:textStyle="bold" />
       </RelativeLayout>
 
       <RelativeLayout
           android:id="@+id/ET_date"
           android:layout_width="match_parent"
-          android:layout_height="match_parent"
+          android:layout_height="60dp"
           android:layout_below="@+id/ET_Label"
-          android:background="@drawable/border_lightgraybox"
-          android:layout_marginTop="20dp">
+          android:layout_marginLeft="15dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginRight="15dp"
+          android:background="@drawable/layout_task">
 
         <ImageView
             android:id="@+id/imageView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginVertical="20dp"
             android:layout_marginLeft="15dp"
-            app:srcCompat="@drawable/calendar" />
+            app:srcCompat="@drawable/baseline_date_range_24" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="10pt"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
             android:layout_toRightOf="@+id/imageView5"
-            android:textStyle="bold"
-            android:layout_marginLeft="30dp"
-            android:text="Date" />
+            android:text="Date"
+            android:textColor="#0984E3"
+            android:textSize="10pt"
+
+            android:textStyle="bold" />
       </RelativeLayout>
 
       <TextView
@@ -221,24 +248,43 @@
           android:layout_height="wrap_content"
           android:layout_below="@+id/ET_date"
           android:layout_margin="20dp"
-          android:textStyle="bold"
-          android:textSize="10pt"
+          android:text="Description"
           android:textColor="@color/white"
-          android:text="Description" />
+          android:textSize="10pt"
+          android:textStyle="bold" />
 
       <EditText
           android:id="@+id/edt_description"
           android:layout_width="match_parent"
           android:layout_height="400dp"
-          android:paddingVertical="20dp"
-          android:paddingHorizontal="20dp"
-          android:ems="10"
-          android:textSize="10pt"
-          android:gravity="top|left"
-          android:inputType="textMultiLine"
           android:layout_below="@+id/description"
-          android:background="@drawable/border_lightgraybox"
-          android:hint="Input any description here" />
+          android:layout_marginLeft="15dp"
+          android:layout_marginRight="15dp"
+          android:background="@drawable/layout_task"
+          android:ems="10"
+          android:gravity="top|left"
+          android:hint="Input any description here"
+          android:inputType="textMultiLine"
+          android:paddingHorizontal="20dp"
+          android:paddingVertical="20dp"
+          android:textSize="10pt" />
+
+      <androidx.appcompat.widget.AppCompatButton
+          android:id="@+id/btn_save"
+          android:layout_width="50dp"
+          android:layout_height="match_parent"
+          android:layout_below="@+id/edt_description"
+          android:layout_marginLeft="15dp"
+          android:layout_marginRight="15dp"
+          android:layout_alignParentStart="true"
+          android:layout_alignParentEnd="true"
+          android:textSize="20dp"
+          android:textColor="@color/white"
+          android:background="@drawable/layoutbutton"
+          android:layout_marginTop="20dp"
+
+          android:text="Save" />
+
     </RelativeLayout>
 
 
