@@ -4,14 +4,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_item_removeTask"
-        android:title="Remove Task"
+        android:id="@+id/menu_item_saveTask"
+        android:title="Save task"
         app:showAsAction="never"
         android:icon="@drawable/baseline_add_card_24"
         />
     <item
-        android:id="@+id/menu_item_assignTask"
-        android:title="Assign Task"
+        android:id="@+id/menu_item_removeTask"
+        android:title="Remove task"
         app:showAsAction="never"
         android:icon="@drawable/baseline_add_card_24"
         />

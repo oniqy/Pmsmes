@@ -1,72 +1,119 @@
 package com.example.pmsmes.Controller;
-import com.example.pmsmes.Adapter.AdapterMember;
-import com.example.pmsmes.ItemAdapter.Stage;
-import com.example.pmsmes.ItemAdapter.Tag;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.DialogFragment;
+
+import com.example.pmsmes.Adapter.AdapterMember;
+import com.example.pmsmes.ItemAdapter.Tag;
 import com.example.pmsmes.ItemAdapter.Task;
+import com.example.pmsmes.ItemAdapter.User;
 import com.example.pmsmes.R;
 import com.example.pmsmes.Utils.APIClient;
 import com.example.pmsmes.Utils.APIInterface;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import com.example.pmsmes.ItemAdapter.User;
 public class EditTask_Activity extends AppCompatActivity {
     private Spinner spinner;
     APIInterface apiServices;
     String projectID = "";
-    String taskId,stageID;
+    String taskId,stageID,projectName;
     private List<String> list;
-    TextView ET_taskName,ET_createdName;
-    EditText ET_taskName_1;
-    ImageButton btnoption,btn_back,imgBtn_addPeople;
-    Button btn_save;
-    ListView list_assignee;
+    TextView taskDirTextView,createdTextView;
+    EditText taskNameEdt, taskDescriptionEdt;
+    ImageButton img_buttonOption;
 
+    public static Button pickDate;
+    ListView list_assignee;
+    ChipGroup tagChipGroup;
     @Override
     @SuppressLint("MissingInflatedId")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_task);
+        setContentView(R.layout.activity_edit_task_2);
         addControl();
         addEvent();
         Intent i = getIntent();
+
         projectID = i.getStringExtra("projectID");
         taskId = i.getStringExtra("taskID");
-        ET_taskName.setText(i.getStringExtra("taskName"));
         stageID = i.getStringExtra("stageID");
         apiServices = APIClient.getClient().create(APIInterface.class);
         loadDetailtask();
         loadSpinnerStage();
     }
+
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker.
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            // Create a new instance of DatePickerDialog and return it.
+            return new DatePickerDialog(requireContext(), this, year, month, day);
+        }
+
+        @SuppressLint("SetTextI18n")
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            // Do something with the date the user picks.
+            pickDate.setText(day +"/"+month+"/"+ year);
+        }
+
+        public static String TAG = "datePicker";
+    }
+
+
+
     private void loadSpinnerStage(){
         apiServices.getProjectStages(APIClient.getToken(getApplicationContext()),projectID)
                 .enqueue(new Callback<Object>() {
@@ -94,7 +141,7 @@ public class EditTask_Activity extends AppCompatActivity {
                             }
                         }
                         ArrayAdapter spinnerAdapter = new ArrayAdapter<>(getApplicationContext(), androidx.constraintlayout.widget.R.layout.support_simple_spinner_dropdown_item, list);
-                        spinner.setAdapter(spinnerAdapter);
+//                        spinner.setAdapter(spinnerAdapter);
 
                     }
                     @Override
@@ -106,123 +153,133 @@ public class EditTask_Activity extends AppCompatActivity {
 
     }
     private void loadDetailtask(){
-        apiServices.getProjectTask(APIClient.getToken(getApplicationContext()),projectID)
-                .enqueue(new Callback<Object>() {
-                    @Override
-                    public void onResponse(Call<Object> call, Response<Object> response) {
-                        if (response.isSuccessful()) {
-                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                            String strObj = gson.toJson(response.body());
-                            try {
-                                JSONObject apiResult = new JSONObject(strObj);
-                                JSONArray data = apiResult.getJSONArray("data");
-                                for (int i = 0; i < data.length(); i++) {
-                                    JSONObject taskObject = data.getJSONObject(i);
-                                    String idtask = taskObject.getString("_id");
-                                    if (idtask.equals(taskId)) {
-                                        Task task = new Task();
-                                        task.setName(data.getJSONObject(i).getString("name"));
-                                        ET_taskName_1.setText(task.getName());
-                                        //Xử lý creator
-                                        JSONObject creatorInfo = data.getJSONObject(i).getJSONObject("creator");
-                                        User creatorOb = new User();
-                                        creatorOb.setId(creatorInfo.getString("_id"));
-                                        creatorOb.setName(creatorInfo.getString("name"));
-                                        ET_createdName.setText(creatorOb.getName());
-                                        creatorOb.setEmail(creatorInfo.getString("email"));
-                                        task.setCreator(creatorOb);
-                                        //Xử lý assignee
-                                        ArrayList<User> assignee = new ArrayList<User>();
-                                        JSONArray assigneeList = data.getJSONObject(i).getJSONArray("assignee");
 
-                                        for (int j =0; j< assigneeList.length();j++) {
-                                            User member = new User();
-                                            member.setId(assigneeList.getJSONObject(i).getString("_id"));
-                                            member.setName(assigneeList.getJSONObject(i).getString("name"));
-                                            member.setEmail(assigneeList.getJSONObject(i).getString("email"));
-                                            assignee.add(member);
-                                        }
-                                        task.setAssignee(assignee);
-                                        AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
-                                                R.layout.item_email,
-                                                task.getAssignee());
-                                        list_assignee.setAdapter(adapterMember);
-                                        //Tags
-                                        ArrayList<Tag> tags = new ArrayList<Tag>();
-                                        JSONArray tagList = data.getJSONObject(i).getJSONArray("tags");
+        apiServices.getTaskByID(APIClient.getToken(getApplicationContext()),
+                projectID,taskId).enqueue(new Callback<Object>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+                    APIClient.logData(response.body());
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONObject data = apiResult.getJSONObject("data");
 
-                                        for (int j =0; j< tagList.length();j++) {
-                                            Tag tag = new Tag();
-                                            tag.setId(tagList.getJSONObject(i).getString("_id"));
-                                            tag.setName(tagList.getJSONObject(i).getString("name"));
-                                            tag.setProject(tagList.getJSONObject(i).getString("project"));
-                                            tag.setColor(tagList.getJSONObject(i).getString("color"));
-                                            tags.add(tag);
-                                        }
-                                        task.setTags(tags);
-                                        if (data.getJSONObject(i).has("stage")){
-                                            task.setStage(data.getJSONObject(i).getJSONObject("stage").getString("_id"));
+                        if (data.getString("name") !=null)
+                            taskNameEdt.setText(data.getString("name"));
 
-                                        }
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
+                        //Xu ly creator
+                        String name = data.getJSONObject("creator").getString("name");
+                        String email = data.getJSONObject("creator").getString("email");
+                        createdTextView.setText("✒️ Created by " + name + " - " + email);
+
+                        //Description
+                        if (data.has("description"))
+                            taskDescriptionEdt.setText(data.getString("description"));
+
+                        //Dir
+                        taskDirTextView.setText("\uD83C\uDFE0 in " + data.getJSONObject("stage").getString("name"));
+
+                        //Tags
+                        for (int i=0; i< data.getJSONArray("tags").length(); i++){
+                            //NOT IMPLEMENTED
+                            addTagsChip(data.getJSONArray("tags").getJSONObject(i).getString("name"),
+                                    data.getJSONArray("tags").getJSONObject(i).getString("color"));
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<Object> call, Throwable t) {
+                        //End date
 
+                        if (data.has("dateDeadline")){
+                            pickDate.setText(data.getString("dateDeadline"));
+                        }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
-                });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                finish();
+                Toast.makeText(getApplicationContext(),"Có gì đó sai sai!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+
+
+    @SuppressLint("ResourceType")
+    private void addTagsChip(String s, String color){
+        Chip chip = new Chip(EditTask_Activity.this);
+        chip.setClickable(true);
+        chip.setCheckable(false);
+        chip.setText(s);
+        int colorHex;
+
+        if (!TextUtils.isEmpty(color)){
+            chip.setChipBackgroundColor(AppCompatResources.getColorStateList(getApplicationContext(), R.color.warning));
+        }
+
+        chip.setCloseIconVisible(true);
+        chip.setOnCloseIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"Delete Tag not implented!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        tagChipGroup.addView(chip);
+    }
+
     private void addControl(){
-         ET_taskName = (TextView) findViewById(R.id.ET_taskName);
-         ET_taskName_1 = (EditText) findViewById(R.id.ET_taskName_1);
-        imgBtn_addPeople = (ImageButton) findViewById(R.id.imgBtn_addPeople);
-         ET_createdName = (TextView) findViewById(R.id.ET_createdName);
-         btnoption = (ImageButton)findViewById(R.id.btnoption);
-        list_assignee = (ListView)findViewById(R.id.list_assignee);
-        btn_save = (Button)findViewById(R.id.btn_save);
-        btn_back = (ImageButton)findViewById(R.id.btn_back);
-        spinner = (Spinner) findViewById(R.id.ET_stageName);
+        tagChipGroup = findViewById(R.id.tagChipGroup);
+        taskDirTextView = findViewById(R.id.taskDirTextView);
+        createdTextView = findViewById(R.id.createdTextView);
+        taskNameEdt = findViewById(R.id.taskNameEdt);
+        taskDescriptionEdt = findViewById(R.id.taskDescriptionEdt);
+        img_buttonOption = findViewById(R.id.img_buttonOption);
+
+        pickDate = (Button) findViewById(R.id.pickDate);
+
     }
     private void addEvent(){
-        btnoption.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showOptionsMenu(v);
-            }
-        });
-        btn_back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),ProjectWorkspaceActivity.class);
-                startActivity(intent);
-            }
-        });
-        imgBtn_addPeople.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
+        pickDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerFragment().show(getSupportFragmentManager(), DatePickerFragment.TAG);
             }
         });
+
+        img_buttonOption.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showOptionsMenu(view);
+            }
+        });
+
     }
+
+
     private void removeTask(){
-        apiServices.removeTask(APIClient.getToken(getApplicationContext()),projectID,taskId)
+
+        JsonObject taskToDelete = new JsonObject();
+        taskToDelete.addProperty("task", taskId);
+
+        apiServices.removeTask(APIClient.getToken(getApplicationContext()),projectID, taskToDelete)
                 .enqueue(new Callback<Object>() {
                     @Override
                     public void onResponse(Call<Object> call, Response<Object> response) {
                         if(response.isSuccessful()){
-                            Toast.makeText(getApplicationContext(),"Remove success",Toast.LENGTH_LONG).show();
+                            finish();
+                            Toast.makeText(getApplicationContext(),"Task removed!",Toast.LENGTH_LONG).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Object> call, Throwable t) {
-
+                        Toast.makeText(getApplicationContext(),"Có gì đó sai sai!",Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -248,16 +305,42 @@ public class EditTask_Activity extends AppCompatActivity {
     }
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.menu_item_removeTask) {
-            removeTask();
+        if (itemId == R.id.menu_item_saveTask) {
+            saveTask();
             return true;
         }
-        else if (itemId == R.id.menu_item_assignTask){
-            AssignTask();
+        else if (itemId == R.id.menu_item_removeTask){
+            removeTask();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void saveTask(){
+
+        JsonObject taskToSave = new JsonObject();
+        taskToSave.addProperty("task", taskId);
+        taskToSave.addProperty("name", String.valueOf(taskNameEdt.getText()));
+        taskToSave.addProperty("description", String.valueOf(taskDescriptionEdt.getText()));
+        taskToSave.addProperty("dateDeadline", String.valueOf(pickDate.getText()));
+        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
+                projectID, taskToSave).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    finish();
+                    Toast.makeText(getApplicationContext(),"Task saved!",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Có gì đó sai sai!",Toast.LENGTH_SHORT).show();
+                Log.d("AKKi", t.getMessage());
+            }
+        });
+    }
+
     private void showOptionsMenu(View view) {
         PopupMenu popupMenu = new PopupMenu(this, view);
         popupMenu.getMenuInflater().inflate(R.menu.option_task, popupMenu.getMenu());

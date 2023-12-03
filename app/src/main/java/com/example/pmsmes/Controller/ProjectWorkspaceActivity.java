@@ -97,6 +97,14 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         loadProjectData(projectID);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        projectStageList.clear();
+        projectTaskList.clear();
+        usersList.clear();
+        loadProjectData(projectID);
+    }
 
     private void addControls(){
         projectName = findViewById(R.id.projectName);
@@ -214,6 +222,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
+
+
     private void getStageTasks(){
         apiServices.getProjectTask(APIClient.getToken(getApplicationContext()),
                 projectStageList.get(0).getProject()).enqueue(new Callback<Object>() {
@@ -222,7 +232,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-
+                    APIClient.logData(response.body());
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
                         JSONArray data = apiResult.getJSONArray("data");
@@ -263,10 +273,10 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
                             for (int j =0; j< tagList.length();j++) {
                                 Tag tag = new Tag();
-                                tag.setId(tagList.getJSONObject(i).getString("_id"));
-                                tag.setName(tagList.getJSONObject(i).getString("name"));
-                                tag.setProject(tagList.getJSONObject(i).getString("project"));
-                                tag.setColor(tagList.getJSONObject(i).getString("color"));
+                                tag.setId(tagList.getString(j));
+//                                tag.setName(tagList.getJSONObject(i).getString("name"));
+//                                tag.setProject(tagList.getJSONObject(i).getString("project"));
+//                                tag.setColor(tagList.getJSONObject(i).getString("color"));
 
                                 tags.add(tag);
                             }

@@ -72,7 +72,6 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="20dp"
           android:layout_marginRight="15dp"
-
           android:layout_marginBottom="15dp"
           android:layout_toRightOf="@+id/ET_name"
           android:background="@drawable/layout_task"
@@ -92,7 +91,7 @@
 
       <Spinner
           android:id="@+id/ET_stageName"
-          android:layout_width="wrap_content"
+          android:layout_width="230dp"
           android:layout_height="wrap_content"
           android:layout_below="@+id/ET_taskName_1"
           android:layout_marginBottom="15dp"
@@ -114,7 +113,7 @@
 
       <TextView
           android:id="@+id/ET_createdName"
-          android:layout_width="wrap_content"
+          android:layout_width="230dp"
           android:layout_height="wrap_content"
           android:layout_below="@+id/ET_stageName"
           android:layout_marginBottom="15dp"
@@ -122,7 +121,7 @@
           android:background="@drawable/layout_task"
           android:paddingHorizontal="7dp"
           android:paddingVertical="5dp"
-          android:text="BeanieQ ngu ngoc"
+          android:text=""
           android:textSize="8pt"
           android:textStyle="italic" />
 

@@ -77,9 +77,13 @@ public interface APIInterface {
     @PATCH("/api/project/{id}/tasks/assign")
     Call<Object> assignTask(@Header("Authorization") String token, @Field("task") String taskID, @Field("assignee") String[] memberToAssignList);
 
-    @FormUrlEncoded
-    @DELETE("/api/project/{id}/tasks/")
-    Call<Object> removeTask(@Header("Authorization") String token, @Path("id") String projectId,@Field("task") String taskID);
+    @GET("/api/project/{id}/task/{taskID}")
+    Call<Object> getTaskByID(@Header("Authorization") String token,@Path("id") String projectId, @Path("taskID") String taskID);
+
+//    @FormUrlEncoded
+//    @DELETE("/api/project/{id}/tasks/")
+    @HTTP(method = "DELETE", path = "/api/project/{id}/tasks/", hasBody = true )
+    Call<Object> removeTask(@Header("Authorization") String token, @Path("id") String projectId,@Body Object taskToDeleteObject);
 
 
     //TAG

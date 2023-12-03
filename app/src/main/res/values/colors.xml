@@ -7,4 +7,8 @@
     <color name="backgroundLogin">#DFE6E9</color>
     <color name="backgroundButtonLogin">#0984E3</color>
     <color name="userName">#2D3436</color>
+    <color name="danger">#c0392b</color>
+    <color name="primary">#3498db</color>
+    <color name="success">#27ae60</color>
+    <color name="warning">#f39c12</color>
 </resources>
