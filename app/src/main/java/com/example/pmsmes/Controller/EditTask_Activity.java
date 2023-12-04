@@ -34,6 +34,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.pmsmes.Adapter.AdapterMember;
+import com.example.pmsmes.ItemAdapter.Stage;
 import com.example.pmsmes.ItemAdapter.Tag;
 import com.example.pmsmes.ItemAdapter.Task;
 import com.example.pmsmes.ItemAdapter.User;
@@ -56,6 +57,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -75,7 +77,7 @@ public class EditTask_Activity extends AppCompatActivity {
     public static Button pickDate;
     ListView list_assignee;
     ChipGroup tagChipGroup;
-    Button memberChipGroup;
+    Button memberChipGroup, changeStageBtn;
 
     ArrayList<Tag> projectTagsList = new ArrayList<>();
     ArrayList<Tag> selectedTagList = new ArrayList<>();
@@ -336,7 +338,7 @@ public class EditTask_Activity extends AppCompatActivity {
         int colorHex;
 
         if (!TextUtils.isEmpty(color)){
-            chip.setChipBackgroundColor(AppCompatResources.getColorStateList(getApplicationContext(), R.color.warning));
+            chip.setChipBackgroundColor(AppCompatResources.getColorStateList(getApplicationContext(), this.getResources().getIdentifier(color,"color",this.getPackageName())));
         }
 
         chip.setCloseIconVisible(false);
@@ -357,6 +359,7 @@ public class EditTask_Activity extends AppCompatActivity {
         taskDescriptionEdt = findViewById(R.id.taskDescriptionEdt);
         img_buttonOption = findViewById(R.id.img_buttonOption);
         memberChipGroup = findViewById(R.id.memberChipGroup);
+        changeStageBtn = findViewById(R.id.changeStageBtn);
 
         pickDate = (Button) findViewById(R.id.pickDate);
 
@@ -367,6 +370,13 @@ public class EditTask_Activity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 new DatePickerFragment().show(getSupportFragmentManager(), DatePickerFragment.TAG);
+            }
+        });
+
+        changeStageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSwitchStageDialog();
             }
         });
 
@@ -393,6 +403,81 @@ public class EditTask_Activity extends AppCompatActivity {
 
 
 
+    }
+
+    private void  showSwitchStageDialog(){
+
+        apiServices.getProjectStages(APIClient.getToken(getApplicationContext()), projectID).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()) {
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+                    ArrayList<Stage> projectStageList = new ArrayList<>();
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONArray stagesList = apiResult.getJSONArray("data");
+
+                        for (int i = 0; i < stagesList.length(); i++) {
+                            Stage stage = new Stage();
+
+                            stage.setProject(projectID);
+                            stage.setId(stagesList.getJSONObject(i).getString("_id"));
+                            stage.setName(stagesList.getJSONObject(i).getString("name"));
+                            stage.setIsCancel(stagesList.getJSONObject(i).getBoolean("isCancel"));
+                            stage.setIsDone(stagesList.getJSONObject(i).getBoolean("isDone"));
+                            stage.setSequence(stagesList.getJSONObject(i).getInt("sequence"));
+                            projectStageList.add(stage);
+                        }
+
+                        //Sort theo sequence
+                        projectStageList.sort(Comparator.comparingInt(o -> o.getSequence()));
+
+                        ArrayList<String> stageName = new ArrayList<>();
+                        String[] listItems = new String[projectStageList.size()];
+                        int j =0;
+                        for (Stage c : projectStageList){
+                            listItems[j] = c.getName();
+                            j++;
+                        }
+
+                        final int[] checkedItem = {-1};
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(EditTask_Activity.this);
+                        builder.setIcon(R.drawable.logopmsme);
+                        builder.setTitle("Switch stage");
+                        builder.setSingleChoiceItems(listItems, checkedItem[0], (DialogInterface.OnClickListener) (dialogInterface, i) -> {
+                            checkedItem[0] = i;
+
+                            JsonObject stageOb = new JsonObject();
+
+                            stageOb.addProperty("task", taskId);
+                            stageOb.addProperty("stage", projectStageList.get(i).getId());
+                            updateTask(stageOb);
+
+                            dialogInterface.dismiss();
+                        });
+
+                        builder.setNegativeButton("Cancel", (dialog, which) -> {
+
+                        });
+
+                        AlertDialog stageSwitchDialog = builder.create();
+
+                        stageSwitchDialog.show();
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+
+        });
     }
 
     private void openMemberDialog(){

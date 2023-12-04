@@ -1,6 +1,8 @@
 package com.example.pmsmes.Adapter;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +43,21 @@ public class AdapterMember extends ArrayAdapter {
         TextView tv_email = convertView.findViewById(R.id.tv_email);
         tv_email.setText(member.getEmail());
         ImageView img_avatar = convertView.findViewById(R.id.img_avatar);
-        Picasso.get().load("https://i.imgflip.com/1a55a.jpg?a472152").resize(100,100).into(img_avatar);
+        Picasso.get().load("https://images.pexels.com/photos/5102561/pexels-photo-5102561.jpeg?").resize(100,100).into(img_avatar);
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Add this user to project?");
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+            }
+        });
         return convertView;
     }
 }
