@@ -120,6 +120,16 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 showOptionsMenu(v);
             }
         });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                projectStageList.clear();
+                projectTaskList.clear();
+                usersList.clear();
+                loadProjectData(projectID);
+            }
+        });
     }
 
     private void loadProjectData(String projectID){
@@ -311,6 +321,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
         //set adapter recyclerView
         adapterStage =new AdapterStage(projectStageList,projectTaskList,this);
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
 
@@ -321,12 +332,15 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         touchHelper.attachToRecyclerView(recyc_Stage);
         recyc_Stage.setAdapter(adapterStage);
 
+
         //Snap item recyclerView
         if (!isSnapHelperAttached) {
             SnapHelper snapHelper = new LinearSnapHelper();
             snapHelper.attachToRecyclerView(recyc_Stage);
             isSnapHelperAttached = true;
         }
+
+        swipeRefreshLayout.setRefreshing(false);
     }
     private void showRemoveMemberDialog(String idMember,String email,int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -522,8 +536,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             return true;
         }
 
+
         return super.onOptionsItemSelected(item);
     }
+
+
+
     @SuppressLint("RestrictedApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -52,6 +52,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -155,7 +157,10 @@ public class EditTask_Activity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date the user picks.
-            pickDate.setText(day +"/"+month+"/"+ year);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            Calendar newDate = Calendar.getInstance();
+            newDate.set(year, month, day);
+            pickDate.setText(formatter.format(newDate.getTime()));
         }
 
         public static String TAG = "datePicker";
@@ -286,7 +291,15 @@ public class EditTask_Activity extends AppCompatActivity {
                         //End date
 
                         if (data.has("dateDeadline")){
-                            pickDate.setText(data.getString("dateDeadline"));
+                            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            SimpleDateFormat outputFormat= new SimpleDateFormat("dd/MM/yyyy");
+                            try {
+                                String finalStr = outputFormat.format(inputFormat.parse(data.getString("dateDeadline")));
+                                pickDate.setText(finalStr);
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+
                         }
 
                         //Assignees
@@ -326,7 +339,7 @@ public class EditTask_Activity extends AppCompatActivity {
             chip.setChipBackgroundColor(AppCompatResources.getColorStateList(getApplicationContext(), R.color.warning));
         }
 
-        chip.setCloseIconVisible(true);
+        chip.setCloseIconVisible(false);
         chip.setOnCloseIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -419,7 +432,7 @@ public class EditTask_Activity extends AppCompatActivity {
                 JsonArray tagsID = new JsonArray();
                 for (int j = 0; j< checkedMembers.length; j++){
                     if (checkedMembers[j]){
-                        tagsID.add(projectMemberList.get(i).getId());
+                        tagsID.add(projectMemberList.get(j).getId());
                     }
                 }
 

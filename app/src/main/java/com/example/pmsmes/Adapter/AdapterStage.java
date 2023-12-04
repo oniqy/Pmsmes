@@ -17,10 +17,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.icu.text.Transliterator;
 import android.os.Build;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -34,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.annotation.NonNull;
@@ -58,6 +62,10 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     AdapterTask adapterTask;
     private Context context;
     private APIInterface apiServices;
+
+    private String m_Text = "";
+
+    private int currentPos = 0;
     public AdapterStage(ArrayList<Stage> itemStage,ArrayList<Task> itemTask, Context context) {
         this.itemStage = itemStage;
         this.context = context;
@@ -95,6 +103,8 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         return new MyViewHolder(itemView);
     }
 
+
+
     @Override
     public void onColumnMoved(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
@@ -128,6 +138,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Stage item = itemStage.get(position);
         Log.d("aki", String.valueOf(position));
+        currentPos = position;
         LinearLayoutManager layoutManager = new LinearLayoutManager(holder.recyclerViewTasks.getContext(),
                 LinearLayoutManager.VERTICAL,false);
         holder.recyclerViewTasks.setLayoutManager(layoutManager);
@@ -265,6 +276,57 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                     });
 
 
+                }
+
+                if (itemId == R.id.menu_item_EditStage){
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Rename stage");
+
+                    final EditText input = new EditText(context);
+
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_TEXT);
+                    input.setText(itemStage.get(currentPos).getName());
+                    builder.setView(input);
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            m_Text = input.getText().toString();
+                            Toast.makeText(context,String.valueOf(currentPos),Toast.LENGTH_SHORT).show();
+                            Stage c = itemStage.get(currentPos);
+                            if (!TextUtils.isEmpty(m_Text)){
+                                c.setName(input.getText().toString());
+                                JsonObject updateStage = new JsonObject();
+                                updateStage.addProperty("stage", c.getId());
+                                updateStage.addProperty("name", c.getName());
+                                apiServices.updateProjectStage(APIClient.getToken(context),
+                                        c.getProject(), updateStage).enqueue(new Callback<Object>() {
+                                    @Override
+                                    public void onResponse(Call<Object> call, Response<Object> response) {
+                                        if (response.isSuccessful()){
+                                            Toast.makeText(context, "Stage name changed", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Object> call, Throwable t) {
+
+                                    }
+                                });
+                            }
+
+
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
                 }
                 return true;
             }
