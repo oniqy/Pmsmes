@@ -8,6 +8,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.PATCH;
@@ -57,9 +58,9 @@ public interface APIInterface {
     @PATCH("/api/project/{id}/stages")
     Call<Object> updateProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Body Object body);
 
-    @FormUrlEncoded
-    @PATCH("/api/project/{id}/stages")
-    Call<Object> removeProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Field("stage") String stageID);
+
+    @HTTP(method = "DELETE", path = "/api/project/{id}/stages", hasBody = true )
+    Call<Object> removeProjectStage(@Header("Authorization") String token, @Path("id") String projectId, @Body Object stageID);
 
     //TASK
     @GET("/api/project/{id}/tasks")
@@ -76,9 +77,13 @@ public interface APIInterface {
     @PATCH("/api/project/{id}/tasks/assign")
     Call<Object> assignTask(@Header("Authorization") String token, @Field("task") String taskID, @Field("assignee") String[] memberToAssignList);
 
-    @FormUrlEncoded
-    @DELETE("/api/project/{id}/tasks/")
-    Call<Object> removeTask(@Header("Authorization") String token, @Path("id") String projectId,@Field("task") String taskID);
+    @GET("/api/project/{id}/task/{taskID}")
+    Call<Object> getTaskByID(@Header("Authorization") String token,@Path("id") String projectId, @Path("taskID") String taskID);
+
+//    @FormUrlEncoded
+//    @DELETE("/api/project/{id}/tasks/")
+    @HTTP(method = "DELETE", path = "/api/project/{id}/tasks/", hasBody = true )
+    Call<Object> removeTask(@Header("Authorization") String token, @Path("id") String projectId,@Body Object taskToDeleteObject);
 
 
     //TAG

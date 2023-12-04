@@ -67,11 +67,25 @@ public class LoginActivity extends AppCompatActivity {
         addControls();
         addEvents();
 
-//        if (APIClient.checkLastLogin(getApplicationContext())){
-//            finish();
-//            Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
-//            startActivity(projectIntent);
-//        }
+        if (APIClient.checkLastLogin(getApplicationContext())){
+            apiServices.getMyProject(APIClient.getToken(getApplicationContext()), APIClient.getUserID(getApplicationContext())).enqueue(new Callback<Object>() {
+                @Override
+                public void onResponse(Call<Object> call, Response<Object> response) {
+                    if (response.isSuccessful()){
+                        finish();
+                        Toast.makeText(getApplicationContext(),"Welcome back!", Toast.LENGTH_SHORT).show();
+                        Intent projectIntent = new Intent(LoginActivity.this, ProjectActivity.class);
+                        startActivity(projectIntent);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Object> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(),"Login session expired! Please login again", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
 
     }
 

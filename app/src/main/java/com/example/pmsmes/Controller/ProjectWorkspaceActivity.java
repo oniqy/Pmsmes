@@ -97,9 +97,18 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         loadProjectData(projectID);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        projectStageList.clear();
+        projectTaskList.clear();
+        usersList.clear();
+        loadProjectData(projectID);
+    }
 
     private void addControls(){
         projectName = findViewById(R.id.projectName);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
     }
@@ -202,7 +211,9 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
                         //Sort theo sequence
                         projectStageList.sort(Comparator.comparingInt(o -> o.getSequence()));
-                        getStageTasks();
+                        if (projectStageList.size()>0){
+                            getStageTasks();
+                        }
 
 
                     } catch (JSONException e) {
@@ -219,6 +230,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
+
+
     private void getStageTasks(){
         apiServices.getProjectTask(APIClient.getToken(getApplicationContext()),
                 projectStageList.get(0).getProject()).enqueue(new Callback<Object>() {
@@ -227,7 +240,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-
+                    APIClient.logData(response.body());
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
                         JSONArray data = apiResult.getJSONArray("data");
@@ -259,8 +272,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                             }
                             task.setAssignee(assignee);
 
-                            //Xử lý stage
-                            task.setStage(data.getJSONObject(i).getJSONObject("stage").getString("_id"));
+
+
 
                             //Tags
                             ArrayList<Tag> tags = new ArrayList<Tag>();
@@ -268,10 +281,10 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
                             for (int j =0; j< tagList.length();j++) {
                                 Tag tag = new Tag();
-                                tag.setId(tagList.getJSONObject(i).getString("_id"));
-                                tag.setName(tagList.getJSONObject(i).getString("name"));
-                                tag.setProject(tagList.getJSONObject(i).getString("project"));
-                                tag.setColor(tagList.getJSONObject(i).getString("color"));
+                                tag.setId(tagList.getString(j));
+//                                tag.setName(tagList.getJSONObject(i).getString("name"));
+//                                tag.setProject(tagList.getJSONObject(i).getString("project"));
+//                                tag.setColor(tagList.getJSONObject(i).getString("color"));
 
                                 tags.add(tag);
                             }
@@ -279,7 +292,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                             task.setTags(tags);
 
                             //Add to global list;
-                            projectTaskList.add(task);
+                            //Xử lý stage
+                            if (data.getJSONObject(i).has("stage")){
+                                task.setStage(data.getJSONObject(i).getJSONObject("stage").getString("_id"));
+                                projectTaskList.add(task);
+                            }
+
                         }
 
                         setupRecycleView();
@@ -295,7 +313,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
-
+    private boolean isSnapHelperAttached = false;
     private void setupRecycleView(){
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
@@ -312,8 +330,11 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         recyc_Stage.setAdapter(adapterStage);
 
         //Snap item recyclerView
-        SnapHelper snapHelper = new LinearSnapHelper();
-        snapHelper.attachToRecyclerView(recyc_Stage);
+        if (!isSnapHelperAttached) {
+            SnapHelper snapHelper = new LinearSnapHelper();
+            snapHelper.attachToRecyclerView(recyc_Stage);
+            isSnapHelperAttached = true;
+        }
     }
     private void showRemoveMemberDialog(String idMember,String email,int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -380,8 +401,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                             ItemStage itemStage = new ItemStage();
                                             itemStage.tvStageName = stageName;
                                             itemStages.add(itemStage);
-                                            adapterStage.notifyDataSetChanged();
-                                            Toast.makeText(getApplicationContext(), "New Stage Added",
+                                            //adapterStage.notifyDataSetChanged();
+                                            Toast.makeText(getApplicationContext(), "New stage added",
                                                     Toast.LENGTH_LONG).show();
                                         } else {
                                             // Handle empty stageName or display a message
