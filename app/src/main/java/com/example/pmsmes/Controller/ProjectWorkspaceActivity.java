@@ -108,7 +108,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
     private void addControls(){
         projectName = findViewById(R.id.projectName);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
     }
@@ -124,6 +123,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                getStageTasks();
                 getProjectStages(projectID);
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -192,6 +192,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
+                    projectStageList.clear();
 
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
@@ -244,6 +245,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
                         JSONArray data = apiResult.getJSONArray("data");
+                        projectTaskList.clear();
 
                         for (int i=0; i< data.length(); i++){
 
@@ -301,6 +303,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                         }
 
                         setupRecycleView();
+                        adapterStage.notifyDataSetChanged();
 
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
@@ -335,6 +338,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             snapHelper.attachToRecyclerView(recyc_Stage);
             isSnapHelperAttached = true;
         }
+        adapterStage.notifyDataSetChanged();
+
     }
     private void showRemoveMemberDialog(String idMember,String email,int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -528,6 +533,10 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         } else if (itemId == R.id.menu_item_addStage) {
             showAddStageDialog();
             return true;
+        } else if (itemId==R.id.menu_item_dashboard) {
+            Intent intent = new Intent(getApplicationContext(), Project_Report.class);
+            intent.putExtra("projectID",projectID);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

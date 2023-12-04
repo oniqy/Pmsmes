@@ -227,13 +227,13 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
 
         adapterTask = new AdapterTask(sortTaskList,position+1);
         adapterTask.setOnTaskItemClickListener(this);
-        adapterTask.notifyDataSetChanged();
         //Move Item Task
         ItemTouchHelper.Callback callback =
                 new ItemMoveTask(adapterTask);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(holder.recyclerViewTasks);
         holder.recyclerViewTasks.setAdapter(adapterTask);
+        adapterTask.notifyDataSetChanged();
         holder.edt_newTask.setText("");
     }
     @SuppressLint("ResourceType")
