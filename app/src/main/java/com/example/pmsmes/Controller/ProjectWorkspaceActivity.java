@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import androidx.recyclerview.widget.SnapHelper;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.pmsmes.Adapter.AdapterMember;
 import com.example.pmsmes.Adapter.AdapterStage;
@@ -76,6 +77,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     private APIInterface apiServices;
     String projectID = "";
     Project project = new Project();
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +101,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     private void addControls(){
         projectName = findViewById(R.id.projectName);
         img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
     }
 
     private void addEvents(){
@@ -107,6 +110,13 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showOptionsMenu(v);
+            }
+        });
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getProjectStages(projectID);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
