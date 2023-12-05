@@ -331,19 +331,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         adapterStage = new AdapterStage(projectStageList,projectTaskList,this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
-
-
-
-
-
         //MoveItem
         ItemTouchHelper.Callback callback =
                 new ItemMoveStage(adapterStage);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyc_Stage);
         recyc_Stage.setAdapter(adapterStage);
-
-
         //Snap item recyclerView
         if (!isSnapHelperAttached) {
             SnapHelper snapHelper = new LinearSnapHelper();

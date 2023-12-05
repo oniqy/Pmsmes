@@ -20,11 +20,29 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:orientation="vertical"
+        android:textStyle="italic"
         android:text="asdfdfdsafasdfasdfasdfasdfasdfasdf"
         android:textSize="20dp"
         app:layout_constraintBottom_toBottomOf="@+id/img_avatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/img_avatar"
-        app:layout_constraintTop_toTopOf="@+id/img_avatar" />
+        app:layout_constraintTop_toTopOf="@+id/img_avatar"
+        app:layout_constraintVertical_bias="0.779" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:orientation="vertical"
+        android:text="hvsten"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@+id/img_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/img_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.382" />
 </androidx.constraintlayout.widget.ConstraintLayout>

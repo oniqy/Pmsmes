@@ -41,7 +41,9 @@ public class AdapterMember extends ArrayAdapter {
             convertView = LayoutInflater.from(context).inflate(resource,null);
         }
         TextView tv_email = convertView.findViewById(R.id.tv_email);
+        TextView tv_hvt = convertView.findViewById(R.id.textView4);
         tv_email.setText(member.getEmail());
+        tv_hvt.setText(member.getName());
         ImageView img_avatar = convertView.findViewById(R.id.img_avatar);
         Picasso.get().load("https://images.pexels.com/photos/5102561/pexels-photo-5102561.jpeg?").resize(100,100).into(img_avatar);
 
