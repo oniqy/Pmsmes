@@ -42,11 +42,8 @@ public class APIClient {
         editor.apply();
     }
 
-    public static void logData(Object object){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String prettyJsonString = gson.toJson(object);
-        Log.d("Akkii", prettyJsonString);
-    }
+
+
 
 
     public static void setLoginInfo(Context context,String token,String account, String userID, String username, String address, String email, String birthday){
@@ -88,6 +85,13 @@ public class APIClient {
 
         return id;
     }
+
+    public static void logData(Object object){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String prettyJsonString = gson.toJson(object);
+        Log.d("Akkii", prettyJsonString);
+    }
+
 
     public static boolean checkLastLogin(Context context){
 

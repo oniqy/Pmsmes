@@ -13,13 +13,18 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 
@@ -52,6 +57,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -120,12 +126,14 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 showOptionsMenu(v);
             }
         });
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getStageTasks();
-                getProjectStages(projectID);
-                swipeRefreshLayout.setRefreshing(false);
+                projectStageList.clear();
+                projectTaskList.clear();
+                usersList.clear();
+                loadProjectData(projectID);
             }
         });
     }
@@ -192,7 +200,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-                    projectStageList.clear();
 
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
@@ -322,6 +329,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
         //set adapter recyclerView
         adapterStage =new AdapterStage(projectStageList,projectTaskList,this);
+
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
 
@@ -332,6 +340,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         touchHelper.attachToRecyclerView(recyc_Stage);
         recyc_Stage.setAdapter(adapterStage);
 
+
         //Snap item recyclerView
         if (!isSnapHelperAttached) {
             SnapHelper snapHelper = new LinearSnapHelper();
@@ -340,6 +349,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         }
         adapterStage.notifyDataSetChanged();
 
+
+        swipeRefreshLayout.setRefreshing(false);
     }
     private void showRemoveMemberDialog(String idMember,String email,int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -539,8 +550,76 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
+        if (itemId == R.id.menu_item_createProjectTag){
+            showAddNewProjectTagDialog();
+        }
+
+
         return super.onOptionsItemSelected(item);
     }
+
+    private void showAddNewProjectTagDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectWorkspaceActivity.this);
+        builder.setTitle("Add new project task");
+
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.row_spinner,null);
+
+        String[] colorCode = new String[]{"danger", "primary","success", "warning"};
+
+        EditText tagName = (EditText) layout.findViewById(R.id.editText1);
+
+        Spinner s = (Spinner) layout.findViewById(R.id.spinner1);
+        ArrayAdapter adapter = new ArrayAdapter(this, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, colorCode);
+
+        s.setAdapter(adapter);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                createNewProjectTag(String.valueOf(tagName.getText()),s.getSelectedItem().toString());
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+
+    }
+
+    private void createNewProjectTag(String tagName, String color){
+        if (TextUtils.isEmpty(tagName)) return;
+
+        apiServices.createProjectTag(APIClient.getToken(getApplicationContext()),
+                projectID, String.valueOf(tagName),color).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    projectStageList.clear();
+                    projectTaskList.clear();
+                    usersList.clear();
+                    loadProjectData(projectID);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"Tag creation failed!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
     @SuppressLint("RestrictedApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -3,6 +3,7 @@ package com.example.pmsmes.Controller;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -26,12 +27,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.pmsmes.Adapter.AdapterMember;
+import com.example.pmsmes.ItemAdapter.Stage;
 import com.example.pmsmes.ItemAdapter.Tag;
 import com.example.pmsmes.ItemAdapter.Task;
 import com.example.pmsmes.ItemAdapter.User;
@@ -43,14 +46,18 @@ import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -70,6 +77,14 @@ public class EditTask_Activity extends AppCompatActivity {
     public static Button pickDate;
     ListView list_assignee;
     ChipGroup tagChipGroup;
+    Button memberChipGroup, changeStageBtn;
+
+    ArrayList<Tag> projectTagsList = new ArrayList<>();
+    ArrayList<Tag> selectedTagList = new ArrayList<>();
+
+    ArrayList<User> projectMemberList = new ArrayList<>();
+    ArrayList<User> assigneeList = new ArrayList<>();
+
     @Override
     @SuppressLint("MissingInflatedId")
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +100,44 @@ public class EditTask_Activity extends AppCompatActivity {
         apiServices = APIClient.getClient().create(APIInterface.class);
         loadDetailtask();
         loadSpinnerStage();
+        getProjectTags();
+
+        getProjectMember();
+    }
+
+    private void getProjectMember(){
+        apiServices.getProjectMemberList(APIClient.getToken(getApplicationContext()),projectID).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+
+                    JSONObject apiResult = null;
+                    try {
+                        apiResult = new JSONObject(strObj);
+                        JSONArray data = apiResult.getJSONArray("data");
+
+                        for (int i =0 ; i<data.length(); i++){
+                            User member = new User();
+                            member.setId(data.getJSONObject(i).getString("_id"));
+                            member.setName(data.getJSONObject(i).getString("name"));
+                            member.setEmail(data.getJSONObject(i).getString("email"));
+                            projectMemberList.add(member);
+                        }
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
     }
 
 
@@ -106,7 +159,10 @@ public class EditTask_Activity extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date the user picks.
-            pickDate.setText(day +"/"+month+"/"+ year);
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            Calendar newDate = Calendar.getInstance();
+            newDate.set(year, month, day);
+            pickDate.setText(formatter.format(newDate.getTime()));
         }
 
         public static String TAG = "datePicker";
@@ -152,6 +208,44 @@ public class EditTask_Activity extends AppCompatActivity {
 
 
     }
+
+    private void getProjectTags(){
+        apiServices.getProjectTag(APIClient.getToken(getApplicationContext()), projectID).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+                    APIClient.logData(response.body());
+
+
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONArray tags = apiResult.getJSONArray("data");
+                        for (int i = 0; i< tags.length(); i++){
+                            Tag projectTag = new Tag();
+                            projectTag.setProject(tags.getJSONObject(i).getString("project"));
+                            projectTag.setName(tags.getJSONObject(i).getString("name"));
+                            projectTag.setId(tags.getJSONObject(i).getString("id"));
+                            projectTag.setColor(tags.getJSONObject(i).getString("color"));
+
+                            projectTagsList.add(projectTag);
+                        }
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
+    }
     private void loadDetailtask(){
 
         apiServices.getTaskByID(APIClient.getToken(getApplicationContext()),
@@ -184,7 +278,14 @@ public class EditTask_Activity extends AppCompatActivity {
 
                         //Tags
                         for (int i=0; i< data.getJSONArray("tags").length(); i++){
-                            //NOT IMPLEMENTED
+                            Tag tag = new Tag();
+                            tag.setId(data.getJSONArray("tags").getJSONObject(i).getString("id"));
+                            tag.setName(data.getJSONArray("tags").getJSONObject(i).getString("name"));
+                            tag.setColor(data.getJSONArray("tags").getJSONObject(i).getString("color"));
+                            tag.setProject(data.getJSONArray("tags").getJSONObject(i).getString("project"));
+
+                            selectedTagList.add(tag);
+
                             addTagsChip(data.getJSONArray("tags").getJSONObject(i).getString("name"),
                                     data.getJSONArray("tags").getJSONObject(i).getString("color"));
                         }
@@ -192,8 +293,26 @@ public class EditTask_Activity extends AppCompatActivity {
                         //End date
 
                         if (data.has("dateDeadline")){
-                            pickDate.setText(data.getString("dateDeadline"));
+                            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                            SimpleDateFormat outputFormat= new SimpleDateFormat("dd/MM/yyyy");
+                            try {
+                                String finalStr = outputFormat.format(inputFormat.parse(data.getString("dateDeadline")));
+                                pickDate.setText(finalStr);
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+
                         }
+
+                        //Assignees
+                        for (int i=0; i< data.getJSONArray("assignee").length(); i++){
+                            User assignee = new User();
+                            assignee.setId(data.getJSONArray("assignee").getJSONObject(i).getString("_id"));
+                            assignee.setName(data.getJSONArray("assignee").getJSONObject(i).getString("name"));
+                            assignee.setEmail(data.getJSONArray("assignee").getJSONObject(i).getString("email"));
+                            assigneeList.add(assignee);
+                        }
+
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -219,10 +338,10 @@ public class EditTask_Activity extends AppCompatActivity {
         int colorHex;
 
         if (!TextUtils.isEmpty(color)){
-            chip.setChipBackgroundColor(AppCompatResources.getColorStateList(getApplicationContext(), R.color.warning));
+            chip.setChipBackgroundColor(AppCompatResources.getColorStateList(getApplicationContext(), this.getResources().getIdentifier(color,"color",this.getPackageName())));
         }
 
-        chip.setCloseIconVisible(true);
+        chip.setCloseIconVisible(false);
         chip.setOnCloseIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -239,6 +358,8 @@ public class EditTask_Activity extends AppCompatActivity {
         taskNameEdt = findViewById(R.id.taskNameEdt);
         taskDescriptionEdt = findViewById(R.id.taskDescriptionEdt);
         img_buttonOption = findViewById(R.id.img_buttonOption);
+        memberChipGroup = findViewById(R.id.memberChipGroup);
+        changeStageBtn = findViewById(R.id.changeStageBtn);
 
         pickDate = (Button) findViewById(R.id.pickDate);
 
@@ -252,10 +373,285 @@ public class EditTask_Activity extends AppCompatActivity {
             }
         });
 
+        changeStageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showSwitchStageDialog();
+            }
+        });
+
         img_buttonOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showOptionsMenu(view);
+            }
+        });
+
+        tagChipGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openTagSelectDialog();
+            }
+        });
+
+        memberChipGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openMemberDialog();
+            }
+        });
+
+
+
+    }
+
+    private void  showSwitchStageDialog(){
+
+        apiServices.getProjectStages(APIClient.getToken(getApplicationContext()), projectID).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()) {
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+                    ArrayList<Stage> projectStageList = new ArrayList<>();
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONArray stagesList = apiResult.getJSONArray("data");
+
+                        for (int i = 0; i < stagesList.length(); i++) {
+                            Stage stage = new Stage();
+
+                            stage.setProject(projectID);
+                            stage.setId(stagesList.getJSONObject(i).getString("_id"));
+                            stage.setName(stagesList.getJSONObject(i).getString("name"));
+                            stage.setIsCancel(stagesList.getJSONObject(i).getBoolean("isCancel"));
+                            stage.setIsDone(stagesList.getJSONObject(i).getBoolean("isDone"));
+                            stage.setSequence(stagesList.getJSONObject(i).getInt("sequence"));
+                            projectStageList.add(stage);
+                        }
+
+                        //Sort theo sequence
+                        projectStageList.sort(Comparator.comparingInt(o -> o.getSequence()));
+
+                        ArrayList<String> stageName = new ArrayList<>();
+                        String[] listItems = new String[projectStageList.size()];
+                        int j =0;
+                        for (Stage c : projectStageList){
+                            listItems[j] = c.getName();
+                            j++;
+                        }
+
+                        final int[] checkedItem = {-1};
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(EditTask_Activity.this);
+                        builder.setIcon(R.drawable.logopmsme);
+                        builder.setTitle("Switch stage");
+                        builder.setSingleChoiceItems(listItems, checkedItem[0], (DialogInterface.OnClickListener) (dialogInterface, i) -> {
+                            checkedItem[0] = i;
+
+                            JsonObject stageOb = new JsonObject();
+
+                            stageOb.addProperty("task", taskId);
+                            stageOb.addProperty("stage", projectStageList.get(i).getId());
+                            updateTask(stageOb);
+
+                            dialogInterface.dismiss();
+                        });
+
+                        builder.setNegativeButton("Cancel", (dialog, which) -> {
+
+                        });
+
+                        AlertDialog stageSwitchDialog = builder.create();
+
+                        stageSwitchDialog.show();
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+
+        });
+    }
+
+    private void openMemberDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditTask_Activity.this);
+        builder.setIcon(R.drawable.logopmsme);
+        builder.setTitle("Task Assignees");
+        final boolean[] checkedMembers= new boolean[projectMemberList.size()];
+        String[] members = new String[projectMemberList.size()];
+
+        for (int i =0; i< projectMemberList.size();i++){
+            members[i] = projectMemberList.get(i).getName();
+            for (User t: assigneeList) {
+                if (t.getId().equals(projectMemberList.get(i).getId())){
+                    checkedMembers[i] = true;
+                }
+            }
+        }
+
+        builder.setMultiChoiceItems(members, checkedMembers, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                checkedMembers[i] = b;
+                String currentItem = projectMemberList.get(i).getName();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                JsonArray tagsID = new JsonArray();
+                for (int j = 0; j< checkedMembers.length; j++){
+                    if (checkedMembers[j]){
+                        tagsID.add(projectMemberList.get(j).getId());
+                    }
+                }
+
+
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                JsonArray list = new JsonArray();
+                list.addAll(tagsID);
+                JsonObject assignee = new JsonObject();
+
+                assignee.addProperty("task", taskId);
+                assignee.add("assignee", list);
+
+                APIClient.logData(assignee);
+
+                updateTask(assignee);
+
+            }
+        });
+
+        builder.create();
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
+    private void updateTask(JsonObject taskObject){
+
+        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),projectID,taskObject).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Intent intent = getIntent();
+                    intent.putExtra("projectID",projectID);
+                    intent.putExtra("taskID",taskId);
+                    intent.putExtra("stageID",stageID);
+                    finish();
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void openTagSelectDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditTask_Activity.this);
+        builder.setIcon(R.drawable.logopmsme);
+        builder.setTitle("Select tags");
+        final boolean[] checkedItems = new boolean[projectTagsList.size()];
+        String[] tags = new String[projectTagsList.size()];
+
+        for (int i =0; i< projectTagsList.size();i++){
+            tags[i] = projectTagsList.get(i).getName();
+            for (Tag t: selectedTagList) {
+                if (t.getId().equals(projectTagsList.get(i).getId())){
+                    checkedItems[i] = true;
+                }
+            }
+        }
+
+
+
+        builder.setMultiChoiceItems(tags, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                checkedItems[i] = b;
+                String currentItem = projectTagsList.get(i).getName();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                saveTaskTag(checkedItems);
+            }
+        });
+
+        builder.create();
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
+    private void saveTaskTag(boolean[] selectedTags){
+
+        int counter = 0;
+        JsonArray tagsID = new JsonArray();
+        for (int i = 0; i< selectedTags.length; i++){
+            if (selectedTags[i]){
+                counter++;
+                tagsID.add(projectTagsList.get(i).getId());
+            }
+        }
+
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonArray list = new JsonArray();
+        list.addAll(tagsID);
+        JsonObject updateTaskTag = new JsonObject();
+
+        updateTaskTag.addProperty("task", taskId);
+        updateTaskTag.add("tags", list);
+
+        APIClient.logData(updateTaskTag);
+
+        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
+                projectID,updateTaskTag).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Intent intent = getIntent();
+                    intent.putExtra("projectID",projectID);
+                    intent.putExtra("taskID",taskId);
+                    intent.putExtra("stageID",stageID);
+                    finish();
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
             }
         });
 
