@@ -274,9 +274,9 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
                             for (int j =0; j< assigneeList.length();j++) {
                                 User member = new User();
-                                member.setId(assigneeList.getJSONObject(i).getString("_id"));
-                                member.setName(assigneeList.getJSONObject(i).getString("name"));
-                                member.setEmail(assigneeList.getJSONObject(i).getString("email"));
+                                member.setId(assigneeList.getJSONObject(j).getString("_id"));
+                                member.setName(assigneeList.getJSONObject(j).getString("name"));
+                                member.setEmail(assigneeList.getJSONObject(j).getString("email"));
                                 assignee.add(member);
                             }
                             task.setAssignee(assignee);

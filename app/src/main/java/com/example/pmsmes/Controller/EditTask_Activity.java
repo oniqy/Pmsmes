@@ -85,6 +85,10 @@ public class EditTask_Activity extends AppCompatActivity {
     ArrayList<User> projectMemberList = new ArrayList<>();
     ArrayList<User> assigneeList = new ArrayList<>();
 
+    String updateTaskStageID ="";
+    JsonArray updateAssigneeList = new JsonArray();
+    JsonArray updateTagsList = new JsonArray();
+
     @Override
     @SuppressLint("MissingInflatedId")
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +107,8 @@ public class EditTask_Activity extends AppCompatActivity {
         getProjectTags();
 
         getProjectMember();
+
+        updateTaskStageID = stageID;
     }
 
     private void getProjectMember(){
@@ -435,24 +441,22 @@ public class EditTask_Activity extends AppCompatActivity {
                         ArrayList<String> stageName = new ArrayList<>();
                         String[] listItems = new String[projectStageList.size()];
                         int j =0;
+                        final int[] checkedItem = {-1};
                         for (Stage c : projectStageList){
                             listItems[j] = c.getName();
+                            if (c.getId().equals(updateTaskStageID))
+                                checkedItem[0]=j;
                             j++;
                         }
 
-                        final int[] checkedItem = {-1};
+
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(EditTask_Activity.this);
                         builder.setIcon(R.drawable.logopmsme);
                         builder.setTitle("Switch stage");
                         builder.setSingleChoiceItems(listItems, checkedItem[0], (DialogInterface.OnClickListener) (dialogInterface, i) -> {
                             checkedItem[0] = i;
-
-                            JsonObject stageOb = new JsonObject();
-
-                            stageOb.addProperty("task", taskId);
-                            stageOb.addProperty("stage", projectStageList.get(i).getId());
-                            updateTask(stageOb);
+                            updateTaskStageID = projectStageList.get(i).getId();
 
                             dialogInterface.dismiss();
                         });
@@ -520,17 +524,9 @@ public class EditTask_Activity extends AppCompatActivity {
                     }
                 }
 
-
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 JsonArray list = new JsonArray();
                 list.addAll(tagsID);
-                JsonObject assignee = new JsonObject();
-
-                assignee.addProperty("task", taskId);
-                assignee.add("assignee", list);
-
-
-                updateTask(assignee);
+                updateAssigneeList = list;
 
             }
         });
@@ -613,44 +609,20 @@ public class EditTask_Activity extends AppCompatActivity {
 
     private void saveTaskTag(boolean[] selectedTags){
 
+        tagChipGroup.removeAllViews();
         int counter = 0;
         JsonArray tagsID = new JsonArray();
         for (int i = 0; i< selectedTags.length; i++){
             if (selectedTags[i]){
                 counter++;
                 tagsID.add(projectTagsList.get(i).getId());
+                addTagsChip(projectTagsList.get(i).getName(), projectTagsList.get(i).getColor());
+
             }
         }
 
+        updateTagsList = tagsID;
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonArray list = new JsonArray();
-        list.addAll(tagsID);
-        JsonObject updateTaskTag = new JsonObject();
-
-        updateTaskTag.addProperty("task", taskId);
-        updateTaskTag.add("tags", list);
-
-
-        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
-                projectID,updateTaskTag).enqueue(new Callback<Object>() {
-            @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                if (response.isSuccessful()){
-                    Intent intent = getIntent();
-                    intent.putExtra("projectID",projectID);
-                    intent.putExtra("taskID",taskId);
-                    intent.putExtra("stageID",stageID);
-                    finish();
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-
-            }
-        });
 
     }
 
@@ -716,6 +688,16 @@ public class EditTask_Activity extends AppCompatActivity {
         taskToSave.addProperty("name", String.valueOf(taskNameEdt.getText()));
         taskToSave.addProperty("description", String.valueOf(taskDescriptionEdt.getText()));
         taskToSave.addProperty("dateDeadline", String.valueOf(pickDate.getText()));
+        if (updateAssigneeList.size()>0)
+            taskToSave.add("assignee", updateAssigneeList);
+
+        if (updateTagsList.size() >0)
+            taskToSave.add("tags", updateTagsList);
+
+        if (!TextUtils.isEmpty(updateTaskStageID))
+            taskToSave.addProperty("stage", updateTaskStageID);
+
+
         apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
                 projectID, taskToSave).enqueue(new Callback<Object>() {
             @Override
