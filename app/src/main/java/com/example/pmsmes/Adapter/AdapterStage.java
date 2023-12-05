@@ -1,9 +1,11 @@
 package com.example.pmsmes.Adapter;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 
 import com.example.pmsmes.Controller.EditTask_Activity;
+import com.example.pmsmes.Controller.ProjectWorkspaceActivity;
 import com.example.pmsmes.ItemAdapter.ItemStage;
 import com.example.pmsmes.ItemAdapter.Item_Task;
 import com.example.pmsmes.ItemAdapter.Stage;
@@ -29,15 +31,17 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.annotation.NonNull;
@@ -60,6 +64,9 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     ArrayList<Stage> itemStage = new ArrayList<>();
     ArrayList<Task> itemTask = new ArrayList<>();
     AdapterTask adapterTask;
+    AdapterStage adapterStage;
+
+    RecyclerView stageRecycleView;
     private Context context;
     private APIInterface apiServices;
 
@@ -71,6 +78,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         this.context = context;
         this.itemTask = itemTask;
         apiServices = APIClient.getClient().create(APIInterface.class);
+        this.adapterStage = this;
 
     }
 
@@ -103,7 +111,12 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         return new MyViewHolder(itemView);
     }
 
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
 
+        stageRecycleView = recyclerView;
+    }
 
     @Override
     public void onColumnMoved(int fromPosition, int toPosition) {
@@ -117,6 +130,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+
     }
 
     @SuppressLint("ResourceAsColor")
@@ -137,11 +151,23 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Stage item = itemStage.get(position);
-        Log.d("aki", String.valueOf(position));
+
         currentPos = position;
         LinearLayoutManager layoutManager = new LinearLayoutManager(holder.recyclerViewTasks.getContext(),
                 LinearLayoutManager.VERTICAL,false);
         holder.recyclerViewTasks.setLayoutManager(layoutManager);
+
+        stageRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE){
+                    currentPos = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();;
+
+                }
+            }
+        });
+
 
         holder.edt_newTask.setVisibility(View.GONE);
         holder.btn_cancel.setVisibility(View.GONE);
@@ -228,6 +254,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
 //        Task task = new Task();
 //        task.setName(taskName);
 //        itemTask.add(task);
+        currentPos = position;
 
         ArrayList<Task> sortTaskList = new ArrayList<>();
         for (Task t: taskList) {
@@ -280,59 +307,118 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
 
                 if (itemId == R.id.menu_item_EditStage){
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("Rename stage");
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                    builder.setTitle("Edit stage");
 
-                    final EditText input = new EditText(context);
+                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View layout = inflater.inflate(R.layout.row_spinner_stage,null);
 
-                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_TEXT);
-                    input.setText(itemStage.get(currentPos).getName());
-                    builder.setView(input);
+                    String[] stageSequence = new String[itemStage.size()];
 
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    for (int i =0; i< stageSequence.length; i++){
+                        stageSequence[i] = itemStage.get(i).getSequence().toString();
+                    }
+
+
+                    TextView title = (TextView) layout.findViewById(R.id.textTitleTxt);
+                    TextView spinnerTitle = (TextView) layout.findViewById(R.id.spinnerTitleTxt);
+                    EditText newStageName = (EditText) layout.findViewById(R.id.editText1);
+                    CheckBox isDoneStage = (CheckBox) layout.findViewById(R.id.isDoneStage);
+
+
+                    Spinner s = (Spinner) layout.findViewById(R.id.spinner1);
+                    ArrayAdapter adapter = new ArrayAdapter(context, com.google.android.material.R.layout.support_simple_spinner_dropdown_item, stageSequence);
+
+                    title.setText("Stage name");
+
+                    spinnerTitle.setText("Sequence");
+                    newStageName.setText(itemStage.get(currentPos).getName());
+                    isDoneStage.setChecked(itemStage.get(currentPos).getIsDone());
+                    s.setAdapter(adapter);
+                    s.setSelection(itemStage.get(currentPos).getSequence());
+
+                    builder.setView(layout);
+
+                    builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            m_Text = input.getText().toString();
-                            Toast.makeText(context,String.valueOf(currentPos),Toast.LENGTH_SHORT).show();
-                            Stage c = itemStage.get(currentPos);
-                            if (!TextUtils.isEmpty(m_Text)){
-                                c.setName(input.getText().toString());
-                                JsonObject updateStage = new JsonObject();
-                                updateStage.addProperty("stage", c.getId());
-                                updateStage.addProperty("name", c.getName());
-                                apiServices.updateProjectStage(APIClient.getToken(context),
-                                        c.getProject(), updateStage).enqueue(new Callback<Object>() {
-                                    @Override
-                                    public void onResponse(Call<Object> call, Response<Object> response) {
-                                        if (response.isSuccessful()){
-                                            Toast.makeText(context, "Stage name changed", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Object> call, Throwable t) {
-
-                                    }
-                                });
-                            }
-
-
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            //Update stage sequence + stage name here
+                            String newStageNameStr = String.valueOf(newStageName.getText());
+                            changeStageSequence(Integer.parseInt(stageSequence[s.getSelectedItemPosition()]), newStageNameStr, isDoneStage.isChecked());
                         }
                     });
+
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
                         }
                     });
 
-                    builder.show();
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 return true;
             }
         });
         popupMenu.show();
     }
+
+    private void changeStageSequence(int newSequence, String newStageNameStr, boolean isDone){
+        Stage oldStage = itemStage.get(currentPos);
+        if (!TextUtils.isEmpty(newStageNameStr))
+            itemStage.get(currentPos).setName(newStageNameStr);
+
+
+        itemStage.get(currentPos).setIsDone(isDone);
+
+        Log.d("getNewSequence", String.valueOf(newSequence));
+        int oldSequence = oldStage.getSequence();
+
+        if (oldSequence < newSequence) {
+            for (int i = oldSequence; i < newSequence; i++) {
+                Collections.swap(itemStage, i, i + 1);
+            }
+        } else {
+            for (int i = oldSequence; i > newSequence; i--) {
+                Collections.swap(itemStage, i, i - 1);
+            }
+        }
+
+        for (int i =0; i< itemStage.size(); i++){
+            itemStage.get(i).setSequence(i);
+            if (isDone){
+                if (i != newSequence) itemStage.get(i).setIsDone(false);
+                else itemStage.get(i).setIsDone(true);
+            }
+        }
+        for (Stage s: itemStage) {
+            Log.d("Sequence aki", String.valueOf(s.getName() + " - "+ s.getSequence()));
+
+            JsonObject updateStage = new JsonObject();
+            updateStage.addProperty("stage", s.getId());
+            updateStage.addProperty("sequence", s.getSequence());
+            updateStage.addProperty("name", s.getName());
+            updateStage.addProperty("isDone", s.getIsDone());
+
+            apiServices.updateProjectStage(APIClient.getToken(context),s.getProject(), updateStage).enqueue(new Callback<Object>() {
+                @Override
+                public void onResponse(Call<Object> call, Response<Object> response) {
+                    if (response.isSuccessful()){
+                        adapterStage.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Object> call, Throwable t) {
+
+                }
+            });
+        }
+
+
+    }
+
 
 
     private void logData(Object object){

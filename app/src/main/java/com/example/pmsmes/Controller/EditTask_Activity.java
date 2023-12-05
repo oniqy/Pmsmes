@@ -216,7 +216,7 @@ public class EditTask_Activity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-                    APIClient.logData(response.body());
+
 
 
                     try {
@@ -256,7 +256,6 @@ public class EditTask_Activity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-                    APIClient.logData(response.body());
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
                         JSONObject data = apiResult.getJSONObject("data");
@@ -530,7 +529,6 @@ public class EditTask_Activity extends AppCompatActivity {
                 assignee.addProperty("task", taskId);
                 assignee.add("assignee", list);
 
-                APIClient.logData(assignee);
 
                 updateTask(assignee);
 
@@ -633,7 +631,6 @@ public class EditTask_Activity extends AppCompatActivity {
         updateTaskTag.addProperty("task", taskId);
         updateTaskTag.add("tags", list);
 
-        APIClient.logData(updateTaskTag);
 
         apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
                 projectID,updateTaskTag).enqueue(new Callback<Object>() {

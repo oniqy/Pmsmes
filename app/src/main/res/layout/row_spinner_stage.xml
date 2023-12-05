@@ -36,4 +36,10 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <CheckBox
+        android:id="@+id/isDoneStage"
+        android:text="isDone stage?"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>

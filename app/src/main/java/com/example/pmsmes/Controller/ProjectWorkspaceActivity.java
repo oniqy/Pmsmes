@@ -1,4 +1,5 @@
 package com.example.pmsmes.Controller;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
@@ -248,7 +249,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-                    APIClient.logData(response.body());
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
                         JSONArray data = apiResult.getJSONArray("data");
@@ -328,10 +328,13 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         //control
         recyc_Stage =(RecyclerView) findViewById(R.id.recyc_Stage);
         //set adapter recyclerView
-        adapterStage =new AdapterStage(projectStageList,projectTaskList,this);
-
+        adapterStage = new AdapterStage(projectStageList,projectTaskList,this);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
         recyc_Stage.setLayoutManager(layoutManager);
+
+
+
+
 
         //MoveItem
         ItemTouchHelper.Callback callback =
@@ -411,15 +414,35 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                         stageName = edt_stageName.getText().toString().trim();
                         apiServices.createNewStage(APIClient.getToken(getApplicationContext()),projectID,stageName)
                                 .enqueue(new Callback<Object>() {
+                                    @SuppressLint("NotifyDataSetChanged")
                                     @Override
                                     public void onResponse(Call<Object> call, Response<Object> response) {
                                         if (!stageName.isEmpty()) {
-                                            ItemStage itemStage = new ItemStage();
-                                            itemStage.tvStageName = stageName;
-                                            itemStages.add(itemStage);
-                                            //adapterStage.notifyDataSetChanged();
+                                            APIClient.logData(response.body());
+
+                                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                            String strObj = gson.toJson(response.body());
+                                            Stage newStage = new Stage();
+                                            try {
+                                                JSONObject apiResult = new JSONObject(strObj);
+
+                                                newStage.setId(apiResult.getJSONObject("data").getString("_id"));
+                                                newStage.setName(apiResult.getJSONObject("data").getString("name"));
+                                                newStage.setSequence(apiResult.getJSONObject("data").getInt("sequence"));
+                                                newStage.setIsDone(apiResult.getJSONObject("data").getBoolean("isDone"));
+
+
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
+
+                                            projectStageList.add(newStage);
+                                            adapterStage.notifyDataSetChanged();
                                             Toast.makeText(getApplicationContext(), "New stage added",
                                                     Toast.LENGTH_LONG).show();
+
+
+
                                         } else {
                                             // Handle empty stageName or display a message
                                             Toast.makeText(getApplicationContext(), "Stage name cannot be empty", Toast.LENGTH_SHORT).show();
