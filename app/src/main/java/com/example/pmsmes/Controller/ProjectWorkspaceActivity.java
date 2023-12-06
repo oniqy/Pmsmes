@@ -40,6 +40,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.pmsmes.Adapter.AdapterMember;
 import com.example.pmsmes.Adapter.AdapterStage;
+import com.example.pmsmes.Adapter.AdapterTag;
 import com.example.pmsmes.Adapter.ItemMoveStage;
 import com.example.pmsmes.ItemAdapter.ItemStage;
 import com.example.pmsmes.ItemAdapter.Project;
@@ -280,8 +281,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                 assignee.add(member);
                             }
                             task.setAssignee(assignee);
-
-
 
 
                             //Tags
@@ -577,8 +576,68 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             showAddNewProjectTagDialog();
         }
 
+        if (itemId == R.id.menu_item_manageProjectTag){
+            showTagManagerDialog();
+        }
+
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showTagManagerDialog(){
+
+        apiServices.getProjectTag(APIClient.getToken(getApplicationContext()),
+                projectID).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful()){
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String strObj = gson.toJson(response.body());
+                    ArrayList<Tag> tagsList = new ArrayList<>();
+                    try {
+                        JSONObject apiResult = new JSONObject(strObj);
+                        JSONArray data = apiResult.getJSONArray("data");
+
+                        for (int i =0; i< data.length(); i++){
+                            Tag t = new Tag();
+                            t.setId(data.getJSONObject(i).getString("id"));
+                            t.setName(data.getJSONObject(i).getString("name"));
+                            t.setProject(data.getJSONObject(i).getString("project"));
+                            t.setColor(data.getJSONObject(i).getString("color"));
+                            tagsList.add(t);
+                        }
+
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectWorkspaceActivity.this);
+                        builder.setTitle("Manage project tags");
+
+                        LayoutInflater inflater = getLayoutInflater();
+                        View layout = inflater.inflate(R.layout.tag_manager,null);
+
+                        AdapterTag tagAdapter = new AdapterTag(ProjectWorkspaceActivity.this,R.layout.tag_item,tagsList);
+                        ListView tagListView = layout.findViewById(R.id.tagList);
+                        tagListView.setAdapter(tagAdapter);
+
+                        builder.setView(layout);
+                        AlertDialog a = builder.create();
+                        a.show();
+
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+
+            }
+        });
+
+
+
     }
 
     private void showAddNewProjectTagDialog(){

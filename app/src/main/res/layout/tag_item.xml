@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="75dp">
+
+    <ImageView
+        android:id="@+id/tagColor"
+        android:layout_gravity="center"
+        android:layout_width="60dp"
+        android:layout_margin="10dp"
+        android:background="@color/primary"
+        android:layout_height="60dp"/>
+
+    <TextView
+        android:padding="5dp"
+        android:layout_weight="8"
+        android:id="@+id/tagName"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:layout_height="65dp"
+        android:background="@drawable/layout_task"
+        android:gravity="center_vertical|start"
+        android:paddingLeft="10dp"
+        android:text="Tag"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</LinearLayout>
