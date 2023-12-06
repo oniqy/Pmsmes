@@ -1,7 +1,9 @@
 package com.example.pmsmes.Controller;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,6 +20,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -51,7 +55,8 @@ public class ProjectActivity extends AppCompatActivity {
 
     TextView title_textView;
     ImageButton img_buttonOption;
-
+    String token;
+    String userID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +64,6 @@ public class ProjectActivity extends AppCompatActivity {
         mapWidget();
         showDialog();
         getAllProject();
-        //dummy();
-
-
-
     }
 
     private void mapWidget() {
@@ -72,12 +73,32 @@ public class ProjectActivity extends AppCompatActivity {
         projectPlus = findViewById(R.id.projectPlus);
         adapterProject = new AdapterProject(getApplicationContext(), projects);
         api = APIClient.getClient().create(APIInterface.class);
+        token = APIClient.getToken(getApplicationContext());
+        userID = APIClient.getUserID(getApplicationContext());
+        projectRecycles.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                int index = projectRecycles.getId();
+                Project project = projects.get(index);
+                Log.i("tuan",project.getName());
+                final CharSequence[] items = {"Xóa dự án"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Tùy chọn");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        System.out.println("Yeahhhhhhhhhhhhhhhhhhhhh");
+                        removeProject(project.getId());
+                    }
+                });
+                builder.show();
+                return true;
+            }
+        });
     }
 
     private void showDialog() {
-
         title_textView.setText(APIClient.getLoggedinName(getApplicationContext()) + "'s workspace");
-
         projectPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,18 +207,34 @@ public class ProjectActivity extends AppCompatActivity {
             }
         });
     }
+    public void removeProject(String id){
+        assert !Objects.equals(token, "Bearer ");
+        api.deleteProject(token,id).enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(@NonNull Call<Object> call, @NonNull Response<Object> response) {
+                getAllProject();
+            }
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                try {
+                    throw new Throwable(t);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 
-    private void getAllProject() {
-        String userID = APIClient.getUserID(getApplicationContext());
-        String token = APIClient.getToken(getApplicationContext());
-        if (userID == null || token == "Bearer ") return;
+    public void getAllProject() {
+        assert !Objects.equals(token, "Bearer ");
+        assert userID != null;
         api.getMyProject(token, userID).enqueue(new Callback<Object>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 String strObj = gson.toJson(response.body());
-                ArrayList<Project> projects1 = new ArrayList<>();
+                projects.clear();
                 try {
                     JSONObject arrObjects = new JSONObject(strObj);
                     for (int i = 0; i < arrObjects.getJSONArray("data").length(); i++) {
@@ -206,9 +243,7 @@ public class ProjectActivity extends AppCompatActivity {
                         project.setName(data.getString("name"));
                         project.setDescription(data.getString("description"));
                         project.setId(data.getString("id"));
-                        projects1.add(project);
-                        projects.clear();
-                        projects.addAll(projects1);
+                        projects.add(project);
                         adapterProject = new AdapterProject(getApplicationContext(),projects);
                         RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(),2,LinearLayoutManager.VERTICAL,false);
                         projectRecycles.setLayoutManager(manager);
@@ -228,38 +263,19 @@ public class ProjectActivity extends AppCompatActivity {
 
     }
 
-    private void dummy() {
-        for (int i = 1; i <= 10; i++) {
-            Project project = new Project();
-            project.setName(String.format("Dự án %s", i));
-            projects.add(project);
-        }
-        adapterProject = new AdapterProject(getApplicationContext(),projects);
-        RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(),2,LinearLayoutManager.VERTICAL,false);
-        projectRecycles.setLayoutManager(manager);
-        projectRecycles.setAdapter(adapterProject);
-    }
-
     private void createProject(String name) {
-
-        api.createNewProject(APIClient.getToken(getApplicationContext()), name, "", APIClient.getUserID(getApplicationContext())).enqueue(new Callback<Object>() {
+        assert !Objects.equals(token, "Bearer ");
+        api.createNewProject(token, name, "", APIClient.getUserID(getApplicationContext())).enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-
-                APIClient.logData(response.body());
                 if (response.isSuccessful()){
                     getAllProject();
                 }
             }
-
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
                 Toast.makeText(getApplicationContext(),"Có gì đó sai sai! Vui lòng kiểm tra lại", Toast.LENGTH_SHORT).show();
-                Log.d("aki", t.getMessage());
             }
         });
-
     }
-
-
 }
