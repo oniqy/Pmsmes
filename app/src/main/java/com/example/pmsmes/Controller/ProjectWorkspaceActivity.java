@@ -465,6 +465,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_addmember,null);
         EditText edt_email = dialogView.findViewById(R.id.edt_email);
+        ImageButton img_find = dialogView.findViewById(R.id.img_find);
         ListView listEmail = dialogView.findViewById(R.id.list_email);
         ListView listAavatar = dialogView.findViewById(R.id.list_avatar);
         String[] AddIdMember = {null};
@@ -472,7 +473,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 R.layout.item_email,
                 project.getMembers());
         listAavatar.setAdapter(adapterMember);
-
         apiServices.getNotInProjectUserList(APIClient.getToken(getApplicationContext()),projectID)
                 .enqueue(new Callback<Object>() {
                     @Override
@@ -480,6 +480,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                         getEmail = edt_email.getText().toString();
                         Gson gson = new GsonBuilder().setPrettyPrinting().create();
                         String strObj = gson.toJson(response.body());
+
                         ArrayList<User> memberNotIn = new ArrayList<>();
                         try {
                             JSONObject apiResult = new JSONObject(strObj);
@@ -493,15 +494,35 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                 usersList.clear();
                                 usersList.addAll(memberNotIn);
                             }
+
                             AdapterMember adapterMember1 = new AdapterMember(getApplicationContext(),
                                     R.layout.item_email,usersList);
                             listEmail.setAdapter(adapterMember1);
+                            img_find.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    String searchText = edt_email.getText().toString().toLowerCase();
+                                    ArrayList<User> findUser = new ArrayList<>();
+
+                                    for (int i = 0; i < usersList.size(); i++) {
+                                        String userName = usersList.get(i).getName().toLowerCase();
+                                        String userEmail = usersList.get(i).getEmail().toLowerCase();
+                                        if (userName.contains(searchText) || userEmail.contains(searchText)) {
+                                            findUser.add(usersList.get(i));
+                                        }
+                                    }
+
+                                    AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
+                                            R.layout.item_email, findUser);
+                                    listEmail.setAdapter(adapterMember);
+                                }
+                            });
                             listEmail.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
                                     edt_email.setText(usersList.get(i).getEmail());
                                     AddIdMember[0] = usersList.get(i).getId();
-                                    Toast.makeText(getApplicationContext(),usersList.get(i).getEmail(),Toast.LENGTH_LONG).show();
                                 }
                             });
                             listAavatar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -550,6 +571,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
