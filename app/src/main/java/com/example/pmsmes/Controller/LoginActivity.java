@@ -42,17 +42,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
-
     TextView forgot_passBtn;
     Button loginBtn;
     EditText username_edt,password_edt;
     ProgressDialog dialog;
     private APIInterface apiServices;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
+        setContentView(R.layout.activity_login);
         forgot_passBtn = findViewById(R.id.forgot_passBtn);
         forgot_passBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,12 +62,9 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(forgotPassIntent);
             }
         });
-
         apiServices = APIClient.getClient().create(APIInterface.class);
-
         addControls();
         addEvents();
-
         if (APIClient.checkLastLogin(getApplicationContext())){
             apiServices.getMyProject(APIClient.getToken(getApplicationContext()), APIClient.getUserID(getApplicationContext())).enqueue(new Callback<Object>() {
                 @Override
@@ -78,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(projectIntent);
                     }
                 }
-
                 @Override
                 public void onFailure(Call<Object> call, Throwable t) {
                     Toast.makeText(getApplicationContext(),"Login session expired! Please login again", Toast.LENGTH_SHORT).show();
