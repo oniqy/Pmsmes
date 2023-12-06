@@ -212,15 +212,16 @@ public class ProjectActivity extends AppCompatActivity {
         api.deleteProject(token,id).enqueue(new Callback<Object>() {
             @Override
             public void onResponse(@NonNull Call<Object> call, @NonNull Response<Object> response) {
-                getAllProject();
+                if (response.isSuccessful()){
+                    projectRecycles.removeAllViews();
+                    adapterProject.notifyDataSetChanged();
+                    projects.clear();
+                    getAllProject();
+                }
             }
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                try {
-                    throw new Throwable(t);
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
+                Toast.makeText(getApplicationContext(),"Có gì đó sai sai! Vui lòng kiểm tra lại", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -248,6 +249,7 @@ public class ProjectActivity extends AppCompatActivity {
                         RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(),2,LinearLayoutManager.VERTICAL,false);
                         projectRecycles.setLayoutManager(manager);
                         projectRecycles.setAdapter(adapterProject);
+
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

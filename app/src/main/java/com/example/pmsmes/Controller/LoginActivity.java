@@ -47,9 +47,12 @@ public class LoginActivity extends AppCompatActivity {
     EditText username_edt,password_edt;
     ProgressDialog dialog;
     private APIInterface apiServices;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
         forgot_passBtn = findViewById(R.id.forgot_passBtn);
         forgot_passBtn.setOnClickListener(new View.OnClickListener() {
