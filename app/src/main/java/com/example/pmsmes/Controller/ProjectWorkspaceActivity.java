@@ -85,6 +85,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     String projectID = "";
     Project project = new Project();
     SwipeRefreshLayout swipeRefreshLayout;
+    SwipeRefreshLayout.OnRefreshListener  onRefreshSwipeFresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,15 +129,23 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
 
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+
+        onRefreshSwipeFresh = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                projectStageList.clear();
-                projectTaskList.clear();
-                usersList.clear();
-                loadProjectData(projectID);
+                refreshInfo();
             }
-        });
+        };
+
+        swipeRefreshLayout.setOnRefreshListener(onRefreshSwipeFresh);
+    }
+
+    private void refreshInfo(){
+        projectStageList.clear();
+        projectTaskList.clear();
+        usersList.clear();
+        loadProjectData(projectID);
     }
 
     private void loadProjectData(String projectID){
@@ -469,10 +478,13 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         ListView listEmail = dialogView.findViewById(R.id.list_email);
         ListView listAavatar = dialogView.findViewById(R.id.list_avatar);
         String[] AddIdMember = {null};
-        AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
+        AdapterMember adapterMember = new AdapterMember(ProjectWorkspaceActivity.this,
                 R.layout.item_email,
-                project.getMembers());
+                project.getMembers(), project.getId(), true);
         listAavatar.setAdapter(adapterMember);
+        listEmail.setLongClickable(true);
+        listAavatar.setLongClickable(true);
+
         apiServices.getNotInProjectUserList(APIClient.getToken(getApplicationContext()),projectID)
                 .enqueue(new Callback<Object>() {
                     @Override
@@ -495,8 +507,9 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                 usersList.addAll(memberNotIn);
                             }
 
-                            AdapterMember adapterMember1 = new AdapterMember(getApplicationContext(),
-                                    R.layout.item_email,usersList);
+                            AdapterMember adapterMember1 = new AdapterMember(ProjectWorkspaceActivity.this,
+                                    R.layout.item_email,usersList, project.getId(),false);
+
                             listEmail.setAdapter(adapterMember1);
                             img_find.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -512,8 +525,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                         }
                                     }
 
-                                    AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
-                                            R.layout.item_email, findUser);
+                                    AdapterMember adapterMember = new AdapterMember(ProjectWorkspaceActivity.this,
+                                            R.layout.item_email, findUser, project.getId(),false);
                                     listEmail.setAdapter(adapterMember);
                                 }
                             });
@@ -544,28 +557,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 });
 
         builder.setView(dialogView)
-                .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        apiServices.addMemberToProject(APIClient.getToken(getApplicationContext()),projectID,AddIdMember[0])
-                                .enqueue(new Callback<Object>() {
-                                    @Override
-                                    public void onResponse(Call<Object> call, Response<Object> response) {
-
-                                        Toast.makeText(getApplicationContext(),"Đã gửi lời mời",Toast.LENGTH_LONG).show();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Object> call, Throwable t) {
-
-                                    }
-                                });
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                .setPositiveButton("Done", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
+                        refreshInfo();
+
                     }
                 });
         AlertDialog dialog = builder.create();

@@ -44,7 +44,7 @@ public interface APIInterface {
 
 
     @DELETE("/api/project/{id}/members")
-    Call<Object> removeMemberFromProject(@Header("Authorization") String token, @Path("id") String projectId,@Query("user") String userID);
+    Call<Object> removeMemberFromProject(@Header("Authorization") String token, @Path("id") String projectId,@Body Object body);
 
     //Stage
     @Headers({ "Content-Type: application/json;charset=UTF-8"})
