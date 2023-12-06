@@ -94,9 +94,9 @@ public interface APIInterface {
     @POST("/api/project/{id}/tags")
     Call<Object> createProjectTag(@Header("Authorization") String token, @Path("id") String projectId, @Field("name") String tagName, @Field("color") String colorHEX);
 
-    @FormUrlEncoded
+
     @PATCH("/api/project/{id}/tags")
-    Call<Object> updateProjectTag(@Header("Authorization") String token, @Path("id") String projectId, @Field("tag") String tagID, @Body Object body);
+    Call<Object> updateProjectTag(@Header("Authorization") String token, @Path("id") String projectId, @Body Object body);
 
     @FormUrlEncoded
     @DELETE("/api/project/{id}/tags")
