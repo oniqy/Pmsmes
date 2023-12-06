@@ -54,7 +54,7 @@
             tools:ignore="MissingConstraints,TouchTargetSizeCheck" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/img_find"
             android:layout_width="75dp"
             android:layout_height="45dp"
             android:layout_marginEnd="15dp"
@@ -69,6 +69,8 @@
             android:layout_width="300dp"
             android:layout_height="270dp"
             android:layout_marginTop="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edt_email" />
