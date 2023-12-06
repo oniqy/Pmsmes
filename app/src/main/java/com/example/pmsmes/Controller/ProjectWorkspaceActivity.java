@@ -468,7 +468,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         ListView listEmail = dialogView.findViewById(R.id.list_email);
         ListView listAavatar = dialogView.findViewById(R.id.list_avatar);
         String[] AddIdMember = {null};
-        AdapterMember adapterMember = new AdapterMember(getApplicationContext(),
+
+        AdapterMember adapterMember = new AdapterMember(ProjectWorkspaceActivity.this,
                 R.layout.item_email,
                 project.getMembers());
         listAavatar.setAdapter(adapterMember);
@@ -493,7 +494,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                                 usersList.clear();
                                 usersList.addAll(memberNotIn);
                             }
-                            AdapterMember adapterMember1 = new AdapterMember(getApplicationContext(),
+                            AdapterMember adapterMember1 = new AdapterMember(ProjectWorkspaceActivity.this,
                                     R.layout.item_email,usersList);
                             listEmail.setAdapter(adapterMember1);
                             listEmail.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -526,19 +527,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.AddMember, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        apiServices.addMemberToProject(APIClient.getToken(getApplicationContext()),projectID,AddIdMember[0])
-                                .enqueue(new Callback<Object>() {
-                                    @Override
-                                    public void onResponse(Call<Object> call, Response<Object> response) {
-
-                                        Toast.makeText(getApplicationContext(),"Đã gửi lời mời",Toast.LENGTH_LONG).show();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Object> call, Throwable t) {
-
-                                    }
-                                });
+                        dialog.dismiss();
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

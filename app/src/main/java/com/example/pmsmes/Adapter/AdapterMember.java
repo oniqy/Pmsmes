@@ -58,6 +58,9 @@ public class AdapterMember extends ArrayAdapter {
 
                     }
                 });
+
+                AlertDialog a  = builder.create();
+                a.show();
             }
         });
         return convertView;
