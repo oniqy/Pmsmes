@@ -87,6 +87,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     Project project = new Project();
     SwipeRefreshLayout swipeRefreshLayout;
     SwipeRefreshLayout.OnRefreshListener  onRefreshSwipeFresh;
+    User creator = new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         apiServices = APIClient.getClient().create(APIInterface.class);
 
         loadProjectData(projectID);
+
     }
 
     @Override
@@ -160,18 +162,22 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                     String strObj = gson.toJson(response.body());
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
+                        User user = new User();
 
                         project.setId(apiResult.getJSONObject("data").getString("_id"));
                         project.setName(apiResult.getJSONObject("data").getString("name"));
                         project.setDescription(apiResult.getJSONObject("data").getString("description"));
                         project.setId(apiResult.getJSONObject("data").getString("_id"));
-
                         SimpleDateFormat formatter1=new SimpleDateFormat("dd/MM/yyyy");
                         project.setStartAt(formatter1.parse(APIClient.convertMongoDate(apiResult.getJSONObject("data").getString("startAt"))));
                         project.setEndAt(formatter1.parse(APIClient.convertMongoDate(apiResult.getJSONObject("data").getString("endAt"))));
 
+
                         ArrayList<User> members = new ArrayList<User>();
                         JSONArray memberInResult = apiResult.getJSONObject("data").getJSONArray("members");
+                        JSONObject creatorInResult = apiResult.getJSONObject("data").getJSONObject("creator");
+                        creator.setId(creatorInResult.getString("_id"));
+
 
                         for (int i=0; i< memberInResult.length(); i++){
                             User member = new User();
@@ -391,15 +397,28 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     //show option Menu
     @SuppressLint("ResourceType")
     private void showOptionsMenu(View view) {
+        String idCreator = creator.getId();
         PopupMenu popupMenu = new PopupMenu(this, view);
-        popupMenu.getMenuInflater().inflate(R.menu.menu_workspace_project, popupMenu.getMenu());
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                onOptionsItemSelected(item);
-                return true;
-            }
-        });
+        if(APIClient.getUserID(getApplicationContext()).equals(idCreator)){
+            popupMenu.getMenuInflater().inflate(R.menu.menu_workspace_project, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    onOptionsItemSelected(item);
+                    return true;
+                }
+            });
+
+        }else {
+            popupMenu.getMenuInflater().inflate(R.menu.menu_member_project, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    onOptionsItemSelected(item);
+                    return true;
+                }
+            });
+        }
         popupMenu.show();
     }
     @SuppressLint({"ResourceType","MissingInflatedId"})
@@ -595,7 +614,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
     private void showTagManagerDialog(){
 
         apiServices.getProjectTag(APIClient.getToken(getApplicationContext()),
