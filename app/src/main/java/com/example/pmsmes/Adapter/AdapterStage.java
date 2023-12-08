@@ -274,7 +274,8 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         adapterTask.notifyDataSetChanged();
         holder.edt_newTask.setText("");
     }
-    @SuppressLint("ResourceType")
+
+    @SuppressLint({"ResourceType","MissingInflatedId"})
     private void showOptionsStage(View view, int position) {
         PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.option_stage, popupMenu.getMenu());
@@ -324,6 +325,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                     TextView spinnerTitle = (TextView) layout.findViewById(R.id.spinnerTitleTxt);
                     EditText newStageName = (EditText) layout.findViewById(R.id.editText1);
                     CheckBox isDoneStage = (CheckBox) layout.findViewById(R.id.isDoneStage);
+                    CheckBox isCancelStage = (CheckBox) layout.findViewById(R.id.isCancelStage);
 
 
                     Spinner s = (Spinner) layout.findViewById(R.id.spinner1);
@@ -334,6 +336,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                     spinnerTitle.setText("Sequence");
                     newStageName.setText(itemStage.get(currentPos).getName());
                     isDoneStage.setChecked(itemStage.get(currentPos).getIsDone());
+                    isCancelStage.setChecked(itemStage.get(currentPos).getIsCancel());
                     s.setAdapter(adapter);
                     s.setSelection(itemStage.get(currentPos).getSequence());
 
@@ -344,7 +347,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                         public void onClick(DialogInterface dialogInterface, int i) {
                             //Update stage sequence + stage name here
                             String newStageNameStr = String.valueOf(newStageName.getText());
-                            changeStageSequence(Integer.parseInt(stageSequence[s.getSelectedItemPosition()]), newStageNameStr, isDoneStage.isChecked());
+                            changeStageSequence(Integer.parseInt(stageSequence[s.getSelectedItemPosition()]), newStageNameStr, isDoneStage.isChecked(),isCancelStage.isChecked());
                         }
                     });
 
@@ -364,7 +367,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         popupMenu.show();
     }
 
-    private void changeStageSequence(int newSequence, String newStageNameStr, boolean isDone){
+    private void changeStageSequence(int newSequence, String newStageNameStr, boolean isDone, boolean isCancel){
         Stage oldStage = itemStage.get(currentPos);
         if (!TextUtils.isEmpty(newStageNameStr))
             itemStage.get(currentPos).setName(newStageNameStr);
@@ -391,6 +394,10 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
                 if (i != newSequence) itemStage.get(i).setIsDone(false);
                 else itemStage.get(i).setIsDone(true);
             }
+            if (isCancel){
+                if (i != newSequence) itemStage.get(i).setIsCancel(false);
+                else itemStage.get(i).setIsCancel(true);
+            }
         }
         for (Stage s: itemStage) {
             Log.d("Sequence aki", String.valueOf(s.getName() + " - "+ s.getSequence()));
@@ -400,6 +407,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
             updateStage.addProperty("sequence", s.getSequence());
             updateStage.addProperty("name", s.getName());
             updateStage.addProperty("isDone", s.getIsDone());
+            updateStage.addProperty("isCancel",s.getIsCancel());
 
             apiServices.updateProjectStage(APIClient.getToken(context),s.getProject(), updateStage).enqueue(new Callback<Object>() {
                 @Override

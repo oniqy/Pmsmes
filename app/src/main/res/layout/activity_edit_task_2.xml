@@ -136,6 +136,7 @@
                 android:text="Task's members"
                 android:textAlignment="viewStart"
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"/>
 
             <TextView
@@ -150,6 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="viewStart"
+
                 android:text="4/4/4444"/>
 
             <TextView

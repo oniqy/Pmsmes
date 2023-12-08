@@ -115,10 +115,7 @@ public class Project_Report extends AppCompatActivity {
                                         task.setStage(array.getJSONObject(i).getJSONObject("stage").getString("_id"));
                                         tasks.add(task);
                                     }
-//                                    String dateDeadline = array.getJSONObject(i).getString("dateDeadline");
-//                                    if(isDateExpired(dateDeadline)){
-//                                        taskExpired.add(task);
-//                                    }
+
                                     if (array.getJSONObject(i).has("stage")){
                                         Boolean statusDone = Boolean.valueOf(array.getJSONObject(i).getJSONObject("stage").getString("isDone"));
                                         Boolean statusCancel = Boolean.valueOf(array.getJSONObject(i).getJSONObject("stage").getString("isCancel"));
@@ -137,12 +134,11 @@ public class Project_Report extends AppCompatActivity {
                                 infoList.add("All Task");
                                 infoList.add("Task Done");
                                 infoList.add("Task cancel");
-                                infoList.add("Task expired");
+
 
                                 countTaskList.add(tasks.size());
                                 countTaskList.add(taskDone.size());
                                 countTaskList.add(taskCancel.size());
-                                countTaskList.add(taskExpired.size());
                                 setProgressBar_Task();
 
                                 GridViewAdapter(infoList, countTaskList);
@@ -151,30 +147,13 @@ public class Project_Report extends AppCompatActivity {
                             }
                         }
                     }
-
                     @Override
                     public void onFailure(Call<Object> call, Throwable t) {
 
                     }
                 });
-
     }
-//    private boolean isDateExpired(String dateDeadline) {
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//        Date currentDate = new Date();
-//
-//        try {
-//            Date deadlineDate = dateFormat.parse(dateDeadline);
-//            // Compare the dates
-//            return currentDate.after(deadlineDate);
-//
-//        } catch (ParseException e) {
-//            // Handle parsing exception
-//            e.printStackTrace();
-//        }
-//
-//        return false;
-//    }
+
     private void GridViewAdapter(List<String> infoList, List<Integer> countTaskList) {
         item_reports.clear(); // Clear the existing data
         int size = Math.min(infoList.size(), countTaskList.size());

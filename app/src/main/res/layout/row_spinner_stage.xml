@@ -41,5 +41,10 @@
         android:text="isDone stage?"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <CheckBox
+        android:id="@+id/isCancelStage"
+        android:text="isCancel Stage?"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

@@ -233,7 +233,8 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                             stage.setSequence(stagesList.getJSONObject(i).getInt("sequence"));
                             projectStageList.add(stage);
                         }
-
+                        projectStageList.size();
+                        Log.e("Stage", String.valueOf(projectStageList.size()));
                         //Sort theo sequence
                         projectStageList.sort(Comparator.comparingInt(o -> o.getSequence()));
                         if (projectStageList.size()>0){
@@ -432,48 +433,7 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         stageName = edt_stageName.getText().toString().trim();
-                        apiServices.createNewStage(APIClient.getToken(getApplicationContext()),projectID,stageName)
-                                .enqueue(new Callback<Object>() {
-                                    @SuppressLint("NotifyDataSetChanged")
-                                    @Override
-                                    public void onResponse(Call<Object> call, Response<Object> response) {
-                                        if (!stageName.isEmpty()) {
-                                            APIClient.logData(response.body());
-
-                                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                                            String strObj = gson.toJson(response.body());
-                                            Stage newStage = new Stage();
-                                            try {
-                                                JSONObject apiResult = new JSONObject(strObj);
-
-                                                newStage.setId(apiResult.getJSONObject("data").getString("_id"));
-                                                newStage.setName(apiResult.getJSONObject("data").getString("name"));
-                                                newStage.setSequence(apiResult.getJSONObject("data").getInt("sequence"));
-                                                newStage.setIsDone(apiResult.getJSONObject("data").getBoolean("isDone"));
-
-
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
-                                            }
-
-                                            projectStageList.add(newStage);
-                                            adapterStage.notifyDataSetChanged();
-                                            Toast.makeText(getApplicationContext(), "New stage added",
-                                                    Toast.LENGTH_LONG).show();
-
-
-
-                                        } else {
-                                            // Handle empty stageName or display a message
-                                            Toast.makeText(getApplicationContext(), "Stage name cannot be empty", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Object> call, Throwable t) {
-                                        Toast.makeText(getApplicationContext(), "Co gi do sai sai", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                        addNewStage(stageName);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -485,6 +445,50 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+    private void addNewStage(String stageName){
+        apiServices.createNewStage(APIClient.getToken(getApplicationContext()),projectID,stageName)
+                .enqueue(new Callback<Object>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(Call<Object> call, Response<Object> response) {
+                        if (!stageName.isEmpty()) {
+                            APIClient.logData(response.body());
+
+                            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                            String strObj = gson.toJson(response.body());
+                            Stage newStage = new Stage();
+                            try {
+                                JSONObject apiResult = new JSONObject(strObj);
+
+                                newStage.setId(apiResult.getJSONObject("data").getString("_id"));
+                                newStage.setName(apiResult.getJSONObject("data").getString("name"));
+                                newStage.setSequence(apiResult.getJSONObject("data").getInt("sequence"));
+                                newStage.setIsDone(apiResult.getJSONObject("data").getBoolean("isDone"));
+
+
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            projectStageList.add(newStage);
+                            adapterStage.notifyDataSetChanged();
+                            Toast.makeText(getApplicationContext(), "New stage added",
+                                    Toast.LENGTH_LONG).show();
+
+
+
+                        } else {
+                            // Handle empty stageName or display a message
+                            Toast.makeText(getApplicationContext(), "Stage name cannot be empty", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Object> call, Throwable t) {
+                        Toast.makeText(getApplicationContext(), "Co gi do sai sai", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
     @SuppressLint({"ResourceType","MissingInflatedId"})
     private void showAddMenberDialog(){
