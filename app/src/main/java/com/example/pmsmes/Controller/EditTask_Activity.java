@@ -88,6 +88,7 @@ public class EditTask_Activity extends AppCompatActivity {
     String updateTaskStageID ="";
     JsonArray updateAssigneeList = new JsonArray();
     JsonArray updateTagsList = new JsonArray();
+    String creator = "";
 
     @Override
     @SuppressLint("MissingInflatedId")
@@ -105,7 +106,6 @@ public class EditTask_Activity extends AppCompatActivity {
         loadDetailtask();
         loadSpinnerStage();
         getProjectTags();
-
         getProjectMember();
 
         updateTaskStageID = stageID;
@@ -270,8 +270,9 @@ public class EditTask_Activity extends AppCompatActivity {
                             taskNameEdt.setText(data.getString("name"));
 
                         //Xu ly creator
-                        String name = data.getJSONObject("creator").getString("name");
+                        String name= data.getJSONObject("creator").getString("name");
                         String email = data.getJSONObject("creator").getString("email");
+                        creator = data.getJSONObject("creator").getString("_id");
                         createdTextView.setText("✒️ Created by " + name + " - " + email);
 
                         //Description
@@ -409,7 +410,6 @@ public class EditTask_Activity extends AppCompatActivity {
 
 
     }
-
     private void  showSwitchStageDialog(){
 
         apiServices.getProjectStages(APIClient.getToken(getApplicationContext()), projectID).enqueue(new Callback<Object>() {
@@ -482,7 +482,6 @@ public class EditTask_Activity extends AppCompatActivity {
 
         });
     }
-
     private void openMemberDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(EditTask_Activity.this);
         builder.setIcon(R.drawable.logopmsme);
@@ -537,25 +536,21 @@ public class EditTask_Activity extends AppCompatActivity {
         alertDialog.show();
 
     }
-
     private void updateTask(JsonObject taskObject){
-
-        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),projectID,taskObject).enqueue(new Callback<Object>() {
+        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
+                projectID, taskObject).enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (response.isSuccessful()){
-                    Intent intent = getIntent();
-                    intent.putExtra("projectID",projectID);
-                    intent.putExtra("taskID",taskId);
-                    intent.putExtra("stageID",stageID);
                     finish();
-                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(),"Task saved!",Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-
+                Toast.makeText(getApplicationContext(),"Có gì đó sai sai!",Toast.LENGTH_SHORT).show();
+                Log.d("AKKi", t.getMessage());
             }
         });
     }
@@ -631,22 +626,28 @@ public class EditTask_Activity extends AppCompatActivity {
 
         JsonObject taskToDelete = new JsonObject();
         taskToDelete.addProperty("task", taskId);
+        if(APIClient.getUserID(getApplicationContext()).equals(creator)){
+            apiServices.removeTask(APIClient.getToken(getApplicationContext()),projectID, taskToDelete)
+                    .enqueue(new Callback<Object>() {
+                        @Override
+                        public void onResponse(Call<Object> call, Response<Object> response) {
+                            if(response.isSuccessful()){
 
-        apiServices.removeTask(APIClient.getToken(getApplicationContext()),projectID, taskToDelete)
-                .enqueue(new Callback<Object>() {
-                    @Override
-                    public void onResponse(Call<Object> call, Response<Object> response) {
-                        if(response.isSuccessful()){
-                            finish();
-                            Toast.makeText(getApplicationContext(),"Task removed!",Toast.LENGTH_LONG).show();
+                                finish();
+                                Toast.makeText(getApplicationContext(),"Task removed!",Toast.LENGTH_LONG).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<Object> call, Throwable t) {
-                        Toast.makeText(getApplicationContext(),"Có gì đó sai sai!",Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<Object> call, Throwable t) {
+                            Toast.makeText(getApplicationContext(),"Có gì đó sai sai!",Toast.LENGTH_LONG).show();
+                        }
+                    });
+        }else {
+            Toast.makeText(getApplicationContext(),"You can't detele this task",Toast.LENGTH_LONG).show();
+
+        }
+
     }
     private void AssignTask(){
         String userID = APIClient.getUserID(getApplicationContext());
@@ -696,24 +697,8 @@ public class EditTask_Activity extends AppCompatActivity {
 
         if (!TextUtils.isEmpty(updateTaskStageID))
             taskToSave.addProperty("stage", updateTaskStageID);
+        updateTask(taskToSave);
 
-
-        apiServices.updateProjectTask(APIClient.getToken(getApplicationContext()),
-                projectID, taskToSave).enqueue(new Callback<Object>() {
-            @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
-                if (response.isSuccessful()){
-                    finish();
-                    Toast.makeText(getApplicationContext(),"Task saved!",Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Có gì đó sai sai!",Toast.LENGTH_SHORT).show();
-                Log.d("AKKi", t.getMessage());
-            }
-        });
     }
 
     private void showOptionsMenu(View view) {

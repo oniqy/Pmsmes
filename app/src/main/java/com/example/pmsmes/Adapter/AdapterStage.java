@@ -81,13 +81,9 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         this.adapterStage = this;
 
     }
-
-
-
     public AdapterStage(Context context) {
         this.context = context;
     }
-
     @Override
     //SelectItemTask
     public void onTaskItemClick(int stagePosition, int taskPosition) {
@@ -110,14 +106,12 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_stage, parent, false);
         return new MyViewHolder(itemView);
     }
-
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
 
         stageRecycleView = recyclerView;
     }
-
     @Override
     public void onColumnMoved(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
@@ -132,22 +126,17 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         notifyItemMoved(fromPosition, toPosition);
 
     }
-
     @SuppressLint("ResourceAsColor")
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     public void onColumnSelected(MyViewHolder myViewHolder) {
 
     }
-
     @Override
     public void onColumnClear(MyViewHolder myViewHolder) {
 
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(int position);
-    }
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Stage item = itemStage.get(position);
@@ -173,7 +162,6 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         holder.btn_cancel.setVisibility(View.GONE);
         holder.btn_save.setVisibility(View.GONE);
 
-
         updateRecyclerViewTask(itemTask,position,holder);
 
         holder.btn_addTask.setOnClickListener(new View.OnClickListener() {
@@ -198,45 +186,7 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         holder.btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String newTask = holder.edt_newTask.getText().toString();
-                if (!newTask.isEmpty()) {
-                    User user = new User();
-                    user.setId(APIClient.getUserID(context));
-                    user.setName(APIClient.getLoggedinName(context));
-                    Task task = new Task();
-                    task.setName(newTask);
-                    task.setCreator(user);
-                    task.setStage(itemStage.get(position).getId());
-
-                    apiServices.createNewTask(APIClient.getToken(context),
-                            itemStage.get(position).getProject(),
-                            task.getName(),
-                            task.getCreator().getId(),
-                            task.getStage()).enqueue(new Callback<Object>() {
-                        @Override
-                        public void onResponse(Call<Object> call, Response<Object> response) {
-                            if (response.isSuccessful()){
-                                itemTask.add(task);
-                                updateRecyclerViewTask(itemTask,position,holder);
-                                Toast.makeText(context, "Created new task", Toast.LENGTH_SHORT).show();
-
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Object> call, Throwable t) {
-                            Toast.makeText(context, "Failed to new task", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    holder.edt_newTask.setVisibility(View.GONE);
-                    holder.btn_cancel.setVisibility(View.GONE);
-                    holder.btn_save.setVisibility(View.GONE);
-
-                } else {
-                    Toast.makeText(v.getContext(), "Please enter a task name",
-                            Toast.LENGTH_SHORT).show();
-                }
+                createNewTask(holder,position);
             }
         });
 
@@ -249,11 +199,47 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         });
         holder.textV_name.setText(item.getName());
     }
+    private void createNewTask(MyViewHolder holder,int positionstage){
+        String newTask = holder.edt_newTask.getText().toString();
+        if (!newTask.isEmpty()) {
+            User user = new User();
+            user.setId(APIClient.getUserID(context));
+            user.setName(APIClient.getLoggedinName(context));
+            Task task = new Task();
+            task.setName(newTask);
+            task.setCreator(user);
+            task.setStage(itemStage.get(positionstage).getId());
+
+            apiServices.createNewTask(APIClient.getToken(context),
+                    itemStage.get(positionstage).getProject(),
+                    task.getName(),
+                    task.getCreator().getId(),
+                    task.getStage()).enqueue(new Callback<Object>() {
+                @Override
+                public void onResponse(Call<Object> call, Response<Object> response) {
+                    if (response.isSuccessful()){
+                        itemTask.add(task);
+                        updateRecyclerViewTask(itemTask,positionstage,holder);
+                        Toast.makeText(context, "Created new task", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+                @Override
+                public void onFailure(Call<Object> call, Throwable t) {
+                    Toast.makeText(context, "Failed to new task", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            holder.edt_newTask.setVisibility(View.GONE);
+            holder.btn_cancel.setVisibility(View.GONE);
+            holder.btn_save.setVisibility(View.GONE);
+
+        } else {
+            Toast.makeText(context, "Please enter a task name",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
     private void updateRecyclerViewTask(ArrayList<Task> taskList, int position, MyViewHolder holder) {
-        //theo task tuong ung voi stage
-//        Task task = new Task();
-//        task.setName(taskName);
-//        itemTask.add(task);
         currentPos = position;
 
         ArrayList<Task> sortTaskList = new ArrayList<>();
@@ -274,7 +260,6 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         adapterTask.notifyDataSetChanged();
         holder.edt_newTask.setText("");
     }
-
     @SuppressLint({"ResourceType","MissingInflatedId"})
     private void showOptionsStage(View view, int position) {
         PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), view);
@@ -366,13 +351,10 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
         });
         popupMenu.show();
     }
-
     private void changeStageSequence(int newSequence, String newStageNameStr, boolean isDone, boolean isCancel){
         Stage oldStage = itemStage.get(currentPos);
         if (!TextUtils.isEmpty(newStageNameStr))
             itemStage.get(currentPos).setName(newStageNameStr);
-
-
         itemStage.get(currentPos).setIsDone(isDone);
 
         Log.d("getNewSequence", String.valueOf(newSequence));
@@ -426,15 +408,11 @@ public class AdapterStage extends RecyclerView.Adapter<AdapterStage.MyViewHolder
 
 
     }
-
-
-
     private void logData(Object object){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String prettyJsonString = gson.toJson(object);
         Log.d("Akkii", prettyJsonString);
     }
-
     @Override
     public int getItemCount() {
         return itemStage.size();

@@ -88,7 +88,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
     SwipeRefreshLayout swipeRefreshLayout;
     SwipeRefreshLayout.OnRefreshListener  onRefreshSwipeFresh;
     User creator = new User();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +106,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         loadProjectData(projectID);
 
     }
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -116,13 +114,11 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         usersList.clear();
         loadProjectData(projectID);
     }
-
     private void addControls(){
         projectName = findViewById(R.id.projectName);
         img_buttonOption = (ImageButton) findViewById(R.id.img_buttonOption);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
     }
-
     private void addEvents(){
 
         img_buttonOption.setOnClickListener(new View.OnClickListener() {
@@ -143,14 +139,12 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
         swipeRefreshLayout.setOnRefreshListener(onRefreshSwipeFresh);
     }
-
     private void refreshInfo(){
         projectStageList.clear();
         projectTaskList.clear();
         usersList.clear();
         loadProjectData(projectID);
     }
-
     private void loadProjectData(String projectID){
         apiServices.getProjectByID(APIClient.getToken(getApplicationContext()),projectID).enqueue(new Callback<Object>() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -209,7 +203,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
-
     private void getProjectStages(String projectID){
         apiServices.getProjectStages(APIClient.getToken(getApplicationContext()), projectID).enqueue(new Callback<Object>() {
             @Override
@@ -217,14 +210,11 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     String strObj = gson.toJson(response.body());
-
                     try {
                         JSONObject apiResult = new JSONObject(strObj);
                         JSONArray stagesList = apiResult.getJSONArray("data");
-
                         for(int i=0; i < stagesList.length(); i++) {
                             Stage stage = new Stage();
-
                             stage.setProject(project.getId());
                             stage.setId(stagesList.getJSONObject(i).getString("_id"));
                             stage.setName(stagesList.getJSONObject(i).getString("name"));
@@ -240,24 +230,17 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
                         if (projectStageList.size()>0){
                             getStageTasks();
                         }
-
-
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-
-
                 }
             }
-
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
 
             }
         });
     }
-
-
     private void getStageTasks(){
         apiServices.getProjectTask(APIClient.getToken(getApplicationContext()),
                 projectStageList.get(0).getProject()).enqueue(new Callback<Object>() {
@@ -506,7 +489,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         listAavatar.setAdapter(adapterMember);
         listEmail.setLongClickable(true);
         listAavatar.setLongClickable(true);
-
         apiServices.getNotInProjectUserList(APIClient.getToken(getApplicationContext()),projectID)
                 .enqueue(new Callback<Object>() {
                     @Override
@@ -590,7 +572,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
     @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -673,7 +654,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
 
     }
-
     private void showAddNewProjectTagDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(ProjectWorkspaceActivity.this);
         builder.setTitle("Add new project task");
@@ -711,7 +691,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
 
     }
-
     private void createNewProjectTag(String tagName, String color){
         if (TextUtils.isEmpty(tagName)) return;
 
@@ -733,9 +712,6 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
     @SuppressLint("RestrictedApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
