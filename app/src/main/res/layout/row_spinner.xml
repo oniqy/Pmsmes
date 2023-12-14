@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:layout_marginTop="5dp"
+    android:paddingHorizontal="20dp"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textTitleTxt"
+        android:text="Tag name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:ems="10" >
+        <requestFocus />
+    </EditText>
+
+    <TextView
+        android:text="Color"
+        android:id="@+id/spinnerTitleTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/editText1"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+</LinearLayout>
