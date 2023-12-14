@@ -647,8 +647,10 @@ public class ProjectWorkspaceActivity extends AppCompatActivity {
 
             }
         });
+    }
 
-
+    private void showAddNewProjectTagDialog_tung(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProjectWorkspaceActivity.this);
 
     }
 
