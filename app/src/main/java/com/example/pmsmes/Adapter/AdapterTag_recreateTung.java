@@ -102,6 +102,7 @@ public class AdapterTag_recreateTung extends ArrayAdapter {
                         update.addProperty("color", maMau[spinner.getSelectedItemPosition()]);
                         update.addProperty("project", tag.getProject());
 
+
                         apiInterface.updateProjectTag(APIClient.getToken(context), tag.getProject(), update).enqueue(new Callback<Object>() {
 
                             @Override
@@ -125,7 +126,11 @@ public class AdapterTag_recreateTung extends ArrayAdapter {
 
 
             }
-        });
+
+        }
+
+        );
+
 
 
         return convertView;
